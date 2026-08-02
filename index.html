@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>週邊們</title>
+  
+  <!-- iOS PWA 桌面 Icon：直接內嵌 100% 真正的白底藍蝴蝶結 PNG Base64 圖檔 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="週邊們">
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSU24ErkJggg==" id="apple-icon">
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSU24ErkJggg==" id="favicon">
+
+  <style>
+    :root {
+      --primary-color: #94B4CB;
+      --primary-light: #eef4f8;
+      --primary-dark: #6a8ea8;
+      --bg-color: #f9fbfd;
+      --card-bg: #ffffff;
+      --text-main: #2c3e50;
+      --text-sub: #7f8c8d;
+      --border-color: #e2e8f0;
+      --danger-color: #e74c3c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 90px; }
+
+    /* Header & Logo */
+    header {
+      background: var(--card-bg);
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      box-shadow: 0 2px 10px rgba(148, 180, 203, 0.1);
+    }
+    .header-title-box { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    
+    .header-logo-box {
+      width: 28px; height: 28px;
+      background: #ffffff;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header-logo-box canvas { width: 100%; height: 100%; }
+
+    .header-title { font-size: 1.15rem; font-weight: 700; color: var(--primary-dark); letter-spacing: 0.5px; }
+    
+    /* Tabs */
+    .tabs { display: flex; background: var(--primary-light); border-radius: 12px; padding: 3px; }
+    .tab-btn {
+      flex: 1; border: none; background: transparent; padding: 8px 0;
+      font-size: 0.9rem; font-weight: 600; color: var(--text-sub);
+      border-radius: 9px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .tab-btn.active { background: var(--card-bg); color: var(--primary-dark); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+    /* Breadcrumbs Nav */
+    .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+    .breadcrumbs { color: var(--primary-dark); font-weight: 600; overflow-x: auto; white-space: nowrap; }
+    .breadcrumbs span { cursor: pointer; text-decoration: underline; }
+
+    /* Main Container */
+    .container { padding: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    
+    .card {
+      background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border-color);
+      padding: 12px; display: flex; flex-direction: column; position: relative;
+      box-shadow: 0 4px 12px rgba(148, 180, 203, 0.08);
+    }
+    .card-folder { border-left: 4px solid var(--primary-color); cursor: pointer; }
+    .card-img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: var(--primary-light); }
+    .card-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .card-sub { font-size: 0.75rem; color: var(--text-sub); }
+    
+    .badge-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .badge { display: inline-block; padding: 2px 6px; background: var(--primary-light); color: var(--primary-dark); border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
+    .badge-danger { background: #fde8e8; color: var(--danger-color); }
+
+    /* Floating Action Bar */
+    .fab-bar {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 12px; background: var(--card-bg); padding: 8px 16px;
+      border-radius: 30px; box-shadow: 0 6px 20px rgba(148, 180, 203, 0.3);
+      border: 1px solid var(--border-color); z-index: 99;
+    }
+    .fab-btn {
+      border: none; background: var(--primary-color); color: white;
+      padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .fab-btn.secondary { background: var(--primary-light); color: var(--primary-dark); }
+
+    /* Modal Form */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--card-bg); width: 100%; max-height: 88vh; border-radius: 20px 20px 0 0;
+      padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+    .modal-title { font-weight: 700; color: var(--primary-dark); }
+    .close-btn { border: none; background: none; font-size: 1.2rem; color: var(--text-sub); cursor: pointer; }
+
+    /* Form Fields */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+    .form-control {
+      width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;
+      font-size: 0.9rem; outline: none; background: #fff;
+    }
+    .form-control:focus { border-color: var(--primary-color); }
+    textarea.form-control { resize: vertical; min-height: 60px; }
+
+    .photo-uploader { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .photo-preview { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); }
+    .photo-add-btn {
+      width: 60px; height: 60px; border-radius: 8px; border: 1px dashed var(--primary-color);
+      display: flex; justify-content: center; align-items: center; color: var(--primary-color);
+      font-size: 1.2rem; cursor: pointer; background: var(--primary-light);
+    }
+
+    .btn-submit { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
+    .btn-transfer { width: 100%; padding: 12px; background: #4caf50; color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
+    .btn-delete { width: 100%; padding: 10px; background: transparent; color: var(--danger-color); border: none; font-size: 0.85rem; margin-top: 5px; cursor: pointer; }
+
+    .calc-box { background: var(--primary-light); padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; color: var(--primary-dark); font-weight: 600; }
+    .other-input-block { margin-top: 6px; display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="header-title-box">
+      <div class="header-logo-box">
+        <canvas id="header-logo-canvas" width="180" height="180"></canvas>
+      </div>
+      <span class="header-title">週邊們</span>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-arrived" onclick="switchTab('arrived')">在家/已到貨</button>
+      <button class="tab-btn" id="tab-preorder" onclick="switchTab('preorder')">預購（未到貨）</button>
+    </div>
+  </header>
+
+  <!-- Breadcrumbs Nav -->
+  <div class="nav-bar">
+    <div class="breadcrumbs" id="breadcrumbs">路徑: <span>主目錄</span></div>
+    <div>
+      <button onclick="backupData()" style="border:none; background:none; font-size:0.75rem; color:var(--text-sub); text-decoration:underline;">備份</button>
+      <button onclick="restoreData()" style="border:none; background:none; font-size:0.75rem; color:var(--text-sub); text-decoration:underline; margin-left:6px;">還原</button>
+    </div>
+  </div>
+
+  <!-- Container -->
+  <div class="container">
+    <div class="grid" id="grid-container"></div>
+  </div>
+
+  <!-- FAB -->
+  <div class="fab-bar">
+    <button class="fab-btn secondary" onclick="openFolderModal()">新增資料夾</button>
+    <button class="fab-btn" onclick="openItemModal()">新增品項</button>
+  </div>
+
+  <!-- Folder Modal -->
+  <div class="modal" id="modal-folder">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">新增資料夾</div>
+        <button class="close-btn" onclick="closeModal('modal-folder')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>資料夾名稱</label>
+        <input type="text" id="folder-name" class="form-control" placeholder="例如：專輯專區、巡演週邊">
+      </div>
+      <button class="btn-submit" onclick="saveFolder()">儲存資料夾</button>
+    </div>
+  </div>
+
+  <!-- Item Modal -->
+  <div class="modal" id="modal-item">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="item-modal-title">品項內容</div>
+        <button class="close-btn" onclick="closeModal('modal-item')">✕</button>
+      </div>
+      
+      <form id="item-form" onsubmit="event.preventDefault();">
+        <!-- 所屬資料夾選擇 -->
+        <div class="form-group">
+          <label>所屬資料夾 (可手動移動位置)</label>
+          <select id="field-folder-select" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label>1. 分類</label>
+          <select id="field-category" class="form-control" onchange="toggleAlbumFields()">
+            <option value="專輯/EP">專輯/EP</option>
+            <option value="巡演場週">巡演場週</option>
+            <option value="團體公司週邊">團體公司週邊</option>
+            <option value="單人公司週邊">單人公司週邊</option>
+            <option value="節目週邊">節目週邊</option>
+            <option value="快閃店/展覽限定">快閃店/展覽限定</option>
+            <option value="生日/紀念日限定">生日/紀念日限定</option>
+            <option value="粉絲應援/站姐週邊">粉絲應援/站姐週邊</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label id="label-item-type">2. 品項</label>
+          <select id="field-item-type" class="form-control">
+            <option value="專輯">專輯</option>
+            <option value="玩偶">玩偶</option>
+            <option value="擺飾">擺飾</option>
+            <option value="家居">家居</option>
+            <option value="卡套">卡套</option>
+            <option value="應援">應援</option>
+            <option value="服飾/配件">服飾/配件</option>
+            <option value="鑰匙圈/掛飾">鑰匙圈/掛飾</option>
+            <option value="徽章/Pin">徽章/Pin</option>
+            <option value="文具/海報/寫真">文具/海報/寫真</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <!-- Part (一): 在家/已到貨 欄位 -->
+        <div id="section-arrived-fields">
+          <div class="form-group">
+            <label>品項名稱 (自訂稱呼)</label>
+            <input type="text" id="field-title" class="form-control" placeholder="例如：EXIST 藍色版">
+          </div>
+          <div class="form-group">
+            <label>3. 價格</label>
+            <input type="number" id="field-price" class="form-control" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>4. 照片 (1-3張)</label>
+            <div class="photo-uploader" id="uploader-photos"></div>
+          </div>
+          <div class="form-group">
+            <label>5. 購入/得到日期</label>
+            <input type="date" id="field-received-date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>6. 購買證明</label>
+            <div class="photo-uploader" id="uploader-proofs"></div>
+          </div>
+
+          <!-- 專輯內容物 -->
+          <div class="form-group" id="group-album-contents" style="display:none; background:#f0f7fc; padding:10px; border-radius:8px;">
+            <label style="color:var(--primary-dark)">7. 專輯內容物</label>
+            <textarea id="field-album-text" class="form-control" placeholder="文字說明..."></textarea>
+            <label style="margin-top:6px;">內容物照片：</label>
+            <div class="photo-uploader" id="uploader-album"></div>
+          </div>
+
+          <div class="form-group">
+            <label>8. 其他說明</label>
+            <textarea id="field-notes" class="form-control" placeholder="備註..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>9. 資訊</label>
+            <textarea id="field-info" class="form-control" placeholder="轉移資訊或備註..."></textarea>
+          </div>
+        </div>
+
+        <!-- Part (二): 預購（未到貨） 欄位 -->
+        <div id="section-preorder-fields" style="display:none;">
+          <div class="form-group">
+            <label>品項名稱 (自訂稱呼)</label>
+            <input type="text" id="field-pre-title" class="form-control" placeholder="例如：2026巡演官方應援棒">
+          </div>
+          <div class="form-group">
+            <label>3. 照片 (1-3張)</label>
+            <div class="photo-uploader" id="uploader-pre-photos"></div>
+          </div>
+          <div class="form-group">
+            <label>4. 下單日期</label>
+            <input type="date" id="field-pre-date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>5. 預計抵達時間</label>
+            <input type="text" id="field-pre-eta" class="form-control" placeholder="例如：2026年10月下旬">
+          </div>
+
+          <!-- 付款狀態選單 -->
+          <div class="form-group">
+            <label>6. 付款狀態選擇</label>
+            <select id="field-pay-type" class="form-control" onchange="togglePaymentFlow()">
+              <option value="全付">全付</option>
+              <option value="付一半">付一半（訂金/二補）</option>
+              <option value="未付">未付</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+
+          <!-- 分支 1: 全付 -->
+          <div id="flow-full" class="flow-block">
+            <div class="form-group">
+              <label>總金額（不含運） (必填)</label>
+              <input type="number" id="pre-full-price" class="form-control" oninput="calcFullTotal()">
+            </div>
+            <div class="form-group">
+              <label>是否需二補</label>
+              <select id="pre-full-need-second" class="form-control">
+                <option value="否">否</option>
+                <option value="是">是</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>付款方式</label>
+              <select id="pre-full-paymethod" class="form-control" onchange="checkOtherField(this, 'pre-full-paymethod-other')">
+                <option value="轉帳">轉帳</option><option value="信用卡">信用卡</option><option value="現金">現金</option><option value="LINE Pay">LINE Pay</option><option value="賣貨便">賣貨便</option><option value="其他">其他</option>
+              </select>
+              <input type="text" id="pre-full-paymethod-other" class="form-control other-input-block" placeholder="請填寫付款方式說明">
+            </div>
+            <div class="form-group">
+              <label>寄送方式</label>
+              <select id="pre-full-shipmethod" class="form-control" onchange="checkOtherShipField(this, 'pre-full-ship-group', 'pre-full-shipmethod-other')">
+                <option value="賣貨便">賣貨便</option><option value="郵寄">郵寄</option><option value="面交">面交</option><option value="其他">其他</option>
+              </select>
+              <input type="text" id="pre-full-shipmethod-other" class="form-control other-input-block" placeholder="請填寫寄送方式說明">
+            </div>
+            <div class="form-group" id="pre-full-ship-group">
+              <label>運費 (若無填0)</label>
+              <input type="number" id="pre-full-shipfee" class="form-control" value="0" oninput="calcFullTotal()">
+            </div>
+            <div class="calc-box" id="calc-full-result">金額加總: $0</div>
+            <div class="form-group" style="margin-top:10px;">
+              <label>其他說明</label>
+              <textarea id="pre-full-notes" class="form-control" placeholder="備註..."></textarea>
+            </div>
+          </div>
+
+          <!-- 分支 2: 付一半 -->
+          <div id="flow-half" class="flow-block" style="display:none;">
+            <div class="form-group">
+              <label>1. 總金額（不含運） (必填)</label>
+              <input type="number" id="pre-half-total" class="form-control" oninput="calcHalfTotal()">
+            </div>
+            <div class="form-group">
+              <label>是否需二補</label>
+              <select id="pre-half-need-second" class="form-control">
+                <option value="否">否</option>
+                <option value="是">是</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>2. 已付金額 (訂金)</label>
+              <input type="number" id="pre-half-paid" class="form-control" oninput="calcHalfTotal()">
+            </div>
+            <div class="form-group">
+              <label>3. 未付金額 (不含運)</label>
+              <input type="number" id="pre-half-unpaid" class="form-control" readonly style="background:#f0f0f0;">
+            </div>
+            <div class="form-group">
+              <label>付款方式</label>
+              <select id="pre-half-paymethod" class="form-control" onchange="checkOtherField(this, 'pre-half-paymethod-other')">
+                <option value="轉帳">轉帳</option><option value="信用卡">信用卡</option><option value="現金">現金</option><option value="LINE Pay">LINE Pay</option><option value="其他">其他</option>
+              </select>
+              <input type="text" id="pre-half-paymethod-other" class="form-control other-input-block" placeholder="請填寫付款方式說明">
+            </div>
+            <div class="form-group">
+              <label>補款方式</label>
+              <select id="pre-half-remethod" class="form-control" onchange="checkOtherField(this, 'pre-half-remethod-other')">
+                <option value="賣貨便">賣貨便</option><option value="轉帳">轉帳</option><option value="信用卡">信用卡</option><option value="現金">現金</option><option value="LINE Pay">LINE Pay</option><option value="其他">其他</option>
+              </select>
+              <input type="text" id="pre-half-remethod-other" class="form-control other-input-block" placeholder="請填寫補款方式說明">
+            </div>
+            <div class="form-group">
+              <label>寄送方式</label>
+              <select id="pre-half-shipmethod" class="form-control" onchange="checkOtherShipField(this, 'pre-half-ship-group', 'pre-half-shipmethod-other')">
+                <option value="賣貨便">賣貨便</option><option value="郵寄">郵寄</option><option value="面交">面交</option><option value="其他">其他</option>
+              </select>
+              <input type="text" id="pre-half-shipmethod-other" class="form-control other-input-block" placeholder="請填寫寄送方式說明">
+            </div>
+            <div class="form-group" id="pre-half-ship-group">
+              <label>運費 (若無填0)</label>
+              <input type="number" id="pre-half-shipfee" class="form-control" value="0" oninput="calcHalfTotal()">
+            </div>
+            <div class="calc-box" id="calc-half-res1">1. 金額加總: $0</div>
+            <div class="calc-box" id="calc-half-res2" style="margin-top:4px;">2. 未付金額加總 (未付+運費): $0</div>
+            <div class="form-group" style="margin-top:10px;">
+              <label>其他說明</label>
+              <textarea id="pre-half-notes" class="form-control" placeholder="備註..."></textarea>
+            </div>
+          </div>
+
+          <!-- 分支 3: 未付 -->
+          <div id="flow-unpaid" class="flow-block" style="display:none;">
+            <div class="form-group">
+              <label>總金額（不含運） (必填)</label>
+              <input type="number" id="pre-unpaid-total" class="form-control" oninput="calcUnpaidTotal()">
+            </div>
+            <div class="form-group">
+              <label>是否需二補</label>
+              <select id="pre-unpaid-need-second" class="form-control">
+                <option value="否">否</option>
+                <option value="是">是</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>付款方式</label>
+              <select id="pre-unpaid-paymethod" class="form-control" onchange="checkOtherField(this, 'pre-unpaid-paymethod-other')">
+                <option value="賣貨便">賣貨便</option><option value="轉帳">轉帳</option><option value="信用卡">信用卡</option><option value="現金">現金</option><option value="LINE Pay">LINE Pay</option><option value="其他">其他</option>
+              </select>
+              <input type="text" id="pre-unpaid-paymethod-other" class="form-control other-input-block" placeholder="請填寫付款方式說明">
+            </div>
+            <div class="form-group">
+              <label>寄送方式</label>
+              <select id="pre-unpaid-shipmethod" class="form-control" onchange="checkOtherShipField(this, 'pre-unpaid-ship-group', 'pre-unpaid-shipmethod-other')">
+                <option value="賣貨便">賣貨便</option><option value="郵寄">郵寄</option><option value="面交">面交</option><option value="其他">其他</option>
+              </select>
+              <input type="text" id="pre-unpaid-shipmethod-other" class="form-control other-input-block" placeholder="請填寫寄送方式說明">
+            </div>
+            <div class="form-group" id="pre-unpaid-ship-group">
+              <label>運費 (若無填0)</label>
+              <input type="number" id="pre-unpaid-shipfee" class="form-control" value="0" oninput="calcUnpaidTotal()">
+            </div>
+            <div class="calc-box" id="calc-unpaid-result">金額加總: $0</div>
+            <div class="form-group" style="margin-top:10px;">
+              <label>其他說明</label>
+              <textarea id="pre-unpaid-notes" class="form-control" placeholder="備註..."></textarea>
+            </div>
+          </div>
+
+          <!-- 分支 4: 其他 -->
+          <div id="flow-other" class="flow-block" style="display:none;">
+            <div class="form-group">
+              <label>1. 總價格</label>
+              <input type="text" id="pre-other-total" class="form-control" placeholder="說明或數字">
+            </div>
+            <div class="form-group">
+              <label>2. 付款方式</label>
+              <input type="text" id="pre-other-paymethod" class="form-control" placeholder="付款說明">
+            </div>
+            <div class="form-group">
+              <label>3. 寄送方式</label>
+              <input type="text" id="pre-other-shipmethod" class="form-control" placeholder="寄送說明">
+            </div>
+            <div class="form-group">
+              <label>4. 其他說明</label>
+              <textarea id="pre-other-notes" class="form-control" placeholder="備註..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 按鈕群組 -->
+        <button type="button" class="btn-submit" onclick="saveItem()">儲存此品項</button>
+        <button type="button" id="btn-transfer-action" class="btn-transfer" style="display:none;" onclick="transferPreorderToArrived()">已到貨，轉移至「在家/已到貨」</button>
+        <button type="button" id="btn-delete-action" class="btn-delete" style="display:none;" onclick="deleteCurrentItem()">刪除此品項</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // --- 在前端動態即時生成 100% 真正的白底藍蝴蝶結 PNG ---
+    function generatePngLogo() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 180;
+      canvas.height = 180;
+      const ctx = canvas.getContext('2d');
+
+      // 1. 純白底色
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, 180, 180);
+
+      // 2. 畫左邊蝴蝶結翅膀
+      ctx.fillStyle = '#94B4CB';
+      ctx.beginPath();
+      ctx.moveTo(90, 85);
+      ctx.bezierCurveTo(50, 35, 15, 55, 35, 95);
+      ctx.bezierCurveTo(55, 130, 82, 105, 90, 95);
+      ctx.fill();
+
+      // 3. 畫右邊蝴蝶結翅膀
+      ctx.beginPath();
+      ctx.moveTo(90, 85);
+      ctx.bezierCurveTo(130, 35, 165, 55, 145, 95);
+      ctx.bezierCurveTo(125, 130, 98, 105, 90, 95);
+      ctx.fill();
+
+      // 4. 下方緞帶飄帶
+      ctx.beginPath();
+      ctx.moveTo(90, 92);
+      ctx.bezierCurveTo(70, 125, 35, 145, 50, 155);
+      ctx.bezierCurveTo(75, 135, 88, 115, 90, 100);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(90, 92);
+      ctx.bezierCurveTo(110, 125, 145, 145, 130, 155);
+      ctx.bezierCurveTo(105, 135, 92, 115, 90, 100);
+      ctx.fill();
+
+      // 5. 中間藍色結點
+      ctx.fillStyle = '#6a8ea8';
+      ctx.beginPath();
+      ctx.arc(90, 91, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 轉成真正的 PNG Data URL 並注入 apple-touch-icon
+      const pngDataUrl = canvas.toDataURL('image/png');
+      document.getElementById('apple-icon').href = pngDataUrl;
+      document.getElementById('favicon').href = pngDataUrl;
+
+      // 順便渲染到頂部 Header 的小卡
+      const headerCanvas = document.getElementById('header-logo-canvas');
+      if (headerCanvas) {
+        const hCtx = headerCanvas.getContext('2d');
+        hCtx.drawImage(canvas, 0, 0);
+      }
+    }
+
+    // 頁面載入時立刻繪製生成的真正的 PNG
+    generatePngLogo();
+
+    let db;
+    let currentTab = 'arrived';
+    let currentFolderId = null;
+    let folderPath = [];
+    let editingItemId = null;
+
+    let imgStore = { photos: [], proofs: [], album: [], prePhotos: [] };
+
+    const request = indexedDB.open("MerchCollectorDB", 2);
+    request.onupgradeneeded = (e) => {
+      db = e.target.result;
+      if (!db.objectStoreNames.contains("folders")) db.createObjectStore("folders", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("items")) db.createObjectStore("items", { keyPath: "id" });
+    };
+    request.onsuccess = (e) => {
+      db = e.target.result;
+      renderGrid();
+    };
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-arrived').classList.toggle('active', tab === 'arrived');
+      document.getElementById('tab-preorder').classList.toggle('active', tab === 'preorder');
+      currentFolderId = null;
+      folderPath = [];
+      updateBreadcrumbs();
+      renderGrid();
+    }
+
+    function updateBreadcrumbs() {
+      const bc = document.getElementById('breadcrumbs');
+      let html = `路徑: <span onclick="navigateToFolder(null)">主目錄</span>`;
+      folderPath.forEach((f, index) => {
+        html += ` > <span onclick="navigateToPathIndex(${index})">${f.name}</span>`;
+      });
+      bc.innerHTML = html;
+    }
+
+    function navigateToFolder(folderId, folderName) {
+      if (folderId === null) {
+        currentFolderId = null;
+        folderPath = [];
+      } else {
+        currentFolderId = folderId;
+        folderPath.push({ id: folderId, name: folderName });
+      }
+      updateBreadcrumbs();
+      renderGrid();
+    }
+
+    function navigateToPathIndex(index) {
+      folderPath = folderPath.slice(0, index + 1);
+      currentFolderId = folderPath[folderPath.length - 1].id;
+      updateBreadcrumbs();
+      renderGrid();
+    }
+
+    function renderGrid() {
+      const container = document.getElementById('grid-container');
+      container.innerHTML = '';
+
+      const tx = db.transaction(["folders", "items"], "readonly");
+      const folderStore = tx.objectStore("folders");
+      const itemStore = tx.objectStore("items");
+
+      let folders = [];
+      let items = [];
+
+      folderStore.openCursor().onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          if (cursor.value.tab === currentTab && cursor.value.parentId === currentFolderId) {
+            folders.push(cursor.value);
+          }
+          cursor.continue();
+        } else {
+          itemStore.openCursor().onsuccess = (e2) => {
+            const cursor2 = e2.target.result;
+            if (cursor2) {
+              if (cursor2.value.tab === currentTab && cursor2.value.folderId === currentFolderId) {
+                items.push(cursor2.value);
+              }
+              cursor2.continue();
+            } else {
+              displayGridElements(folders, items);
+            }
+          };
+        }
+      };
+    }
+
+    function displayGridElements(folders, items) {
+      const container = document.getElementById('grid-container');
+
+      folders.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'card card-folder';
+        div.onclick = () => navigateToFolder(f.id, f.name);
+        div.innerHTML = `
+          <div style="font-size: 1.8rem; text-align:center; margin: 8px 0; color:var(--primary-color);">資料夾</div>
+          <div class="card-title">${f.name}</div>
+          <div class="card-sub">資料夾</div>
+        `;
+        container.appendChild(div);
+      });
+
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.onclick = () => openItemModal(item);
+        
+        let coverImg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="%2394B4CB"><rect width="100" height="100" fill="%23eef4f8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="%2394B4CB">無圖片</text></svg>';
+        
+        if (item.tab === 'arrived' && item.photos && item.photos.length > 0) coverImg = item.photos[0];
+        if (item.tab === 'preorder' && item.prePhotos && item.prePhotos.length > 0) coverImg = item.prePhotos[0];
+
+        const title = item.tab === 'arrived' ? (item.title || item.category) : (item.preTitle || item.category);
+        const priceDisplay = item.tab === 'arrived' ? `$${item.price || 0}` : getPreorderPriceBadge(item);
+        
+        let needSecondHtml = '';
+        if (item.tab === 'preorder' && item.needSecond === '是') {
+          needSecondHtml = `<span class="badge badge-danger">需二補</span>`;
+        }
+
+        div.innerHTML = `
+          <img src="${coverImg}" class="card-img" alt="週邊圖" loading="lazy">
+          <div class="card-title">${title}</div>
+          <div class="card-sub">${item.itemType}</div>
+          <div class="badge-container">
+            <span class="badge">${priceDisplay}</span>
+            ${needSecondHtml}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function getPreorderPriceBadge(item) {
+      if (item.payType === '全付') return `全付 $${item.fullTotal || 0}`;
+      if (item.payType === '付一半') return `總額 $${item.halfTotal || 0}`;
+      if (item.payType === '未付') return `待付 $${item.unpaidTotal || 0}`;
+      return `約 $${item.otherTotal || 0}`;
+    }
+
+    function openFolderModal() {
+      document.getElementById('folder-name').value = '';
+      document.getElementById('modal-folder').classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function saveFolder() {
+      const name = document.getElementById('folder-name').value.trim();
+      if (!name) return alert('請輸入資料夾名稱');
+
+      const folder = {
+        id: 'f_' + Date.now(),
+        name: name,
+        tab: currentTab,
+        parentId: currentFolderId
+      };
+
+      const tx = db.transaction("folders", "readwrite");
+      tx.objectStore("folders").add(folder);
+      tx.oncomplete = () => {
+        closeModal('modal-folder');
+        renderGrid();
+      };
+    }
+
+    function populateFolderSelect(selectedFolderId) {
+      const select = document.getElementById('field-folder-select');
+      select.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
+
+      const tx = db.transaction("folders", "readonly");
+      tx.objectStore("folders").openCursor().onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          if (cursor.value.tab === currentTab) {
+            const opt = document.createElement('option');
+            opt.value = cursor.value.id;
+            opt.innerText = cursor.value.name;
+            if (cursor.value.id === selectedFolderId) opt.selected = true;
+            select.appendChild(opt);
+          }
+          cursor.continue();
+        }
+      };
+    }
+
+    function openItemModal(item = null) {
+      editingItemId = item ? item.id : null;
+      document.getElementById('item-form').reset();
+      imgStore = { photos: [], proofs: [], album: [], prePhotos: [] };
+
+      populateFolderSelect(item ? item.folderId : currentFolderId);
+
+      document.getElementById('section-arrived-fields').style.display = currentTab === 'arrived' ? 'block' : 'none';
+      document.getElementById('section-preorder-fields').style.display = currentTab === 'preorder' ? 'block' : 'none';
+
+      document.getElementById('btn-delete-action').style.display = item ? 'block' : 'none';
+      document.getElementById('btn-transfer-action').style.display = (item && currentTab === 'preorder') ? 'block' : 'none';
+
+      if (item) {
+        document.getElementById('field-category').value = item.category || '專輯/EP';
+        document.getElementById('field-item-type').value = item.itemType || '玩偶';
+
+        if (currentTab === 'arrived') {
+          document.getElementById('field-title').value = item.title || '';
+          document.getElementById('field-price').value = item.price || 0;
+          document.getElementById('field-received-date').value = item.receivedDate || '';
+          document.getElementById('field-album-text').value = item.albumText || '';
+          document.getElementById('field-notes').value = item.notes || '';
+          document.getElementById('field-info').value = item.info || '';
+          imgStore.photos = item.photos || [];
+          imgStore.proofs = item.proofs || [];
+          imgStore.album = item.album || [];
+        } else {
+          document.getElementById('field-pre-title').value = item.preTitle || '';
+          document.getElementById('field-pre-date').value = item.preDate || '';
+          document.getElementById('field-pre-eta').value = item.preEta || '';
+          document.getElementById('field-pay-type').value = item.payType || '全付';
+
+          document.getElementById('pre-full-price').value = item.fullPrice || 0;
+          document.getElementById('pre-full-shipfee').value = item.fullShipFee || 0;
+          document.getElementById('pre-full-need-second').value = item.needSecond || '否';
+          document.getElementById('pre-full-notes').value = item.preNotes || '';
+
+          document.getElementById('pre-half-total').value = item.halfPrice || 0;
+          document.getElementById('pre-half-paid').value = item.halfPaid || 0;
+          document.getElementById('pre-half-shipfee').value = item.halfShipFee || 0;
+          document.getElementById('pre-half-need-second').value = item.needSecond || '否';
+          document.getElementById('pre-half-notes').value = item.preNotes || '';
+
+          document.getElementById('pre-unpaid-total').value = item.unpaidPrice || 0;
+          document.getElementById('pre-unpaid-shipfee').value = item.unpaidShipFee || 0;
+          document.getElementById('pre-unpaid-need-second').value = item.needSecond || '否';
+          document.getElementById('pre-unpaid-notes').value = item.preNotes || '';
+
+          document.getElementById('pre-other-total').value = item.otherTotal || '';
+          document.getElementById('pre-other-paymethod').value = item.otherPay || '';
+          document.getElementById('pre-other-shipmethod').value = item.otherShip || '';
+          document.getElementById('pre-other-notes').value = item.preNotes || '';
+
+          imgStore.prePhotos = item.prePhotos || [];
+        }
+      }
+
+      toggleAlbumFields();
+      togglePaymentFlow();
+      renderAllPhotoUploaders();
+      
+      document.getElementById('modal-item').classList.add('active');
+    }
+
+    function toggleAlbumFields() {
+      const cat = document.getElementById('field-category').value;
+      const isAlbum = cat === '專輯/EP';
+      document.getElementById('group-album-contents').style.display = (isAlbum && currentTab === 'arrived') ? 'block' : 'none';
+    }
+
+    function togglePaymentFlow() {
+      if (currentTab !== 'preorder') return;
+      const type = document.getElementById('field-pay-type').value;
+      document.getElementById('flow-full').style.display = type === '全付' ? 'block' : 'none';
+      document.getElementById('flow-half').style.display = type === '付一半' ? 'block' : 'none';
+      document.getElementById('flow-unpaid').style.display = type === '未付' ? 'block' : 'none';
+      document.getElementById('flow-other').style.display = type === '其他' ? 'block' : 'none';
+
+      calcFullTotal();
+      calcHalfTotal();
+      calcUnpaidTotal();
+    }
+
+    function checkOtherField(selectEl, targetInputId) {
+      const target = document.getElementById(targetInputId);
+      if (target) target.style.display = selectEl.value === '其他' ? 'block' : 'none';
+    }
+
+    function checkOtherShipField(selectEl, shipGroupFeeId, targetInputId) {
+      const target = document.getElementById(targetInputId);
+      const shipGroup = document.getElementById(shipGroupFeeId);
+      if (target) target.style.display = selectEl.value === '其他' ? 'block' : 'none';
+      if (shipGroup) shipGroup.style.display = 'block';
+    }
+
+    function calcFullTotal() {
+      const p = parseFloat(document.getElementById('pre-full-price').value) || 0;
+      const s = parseFloat(document.getElementById('pre-full-shipfee').value) || 0;
+      document.getElementById('calc-full-result').innerText = `金額加總: $${p + s}`;
+      return p + s;
+    }
+
+    function calcHalfTotal() {
+      const total = parseFloat(document.getElementById('pre-half-total').value) || 0;
+      const paid = parseFloat(document.getElementById('pre-half-paid').value) || 0;
+      const s = parseFloat(document.getElementById('pre-half-shipfee').value) || 0;
+
+      const unpaid = total - paid;
+      document.getElementById('pre-half-unpaid').value = unpaid;
+
+      document.getElementById('calc-half-res1').innerText = `1. 金額加總: $${total + s}`;
+      document.getElementById('calc-half-res2').innerText = `2. 未付金額加總 (未付+運費): $${unpaid + s}`;
+      return { totalWithShip: total + s, unpaidWithShip: unpaid + s };
+    }
+
+    function calcUnpaidTotal() {
+      const p = parseFloat(document.getElementById('pre-unpaid-total').value) || 0;
+      const s = parseFloat(document.getElementById('pre-unpaid-shipfee').value) || 0;
+      document.getElementById('calc-unpaid-result').innerText = `金額加總: $${p + s}`;
+      return p + s;
+    }
+
+    function renderAllPhotoUploaders() {
+      renderUploader('uploader-photos', imgStore.photos, 3, 'photos');
+      renderUploader('uploader-proofs', imgStore.proofs, 3, 'proofs');
+      renderUploader('uploader-album', imgStore.album, 10, 'album');
+      renderUploader('uploader-pre-photos', imgStore.prePhotos, 3, 'prePhotos');
+    }
+
+    function renderUploader(elementId, array, max, key) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      el.innerHTML = '';
+      array.forEach((imgSrc, idx) => {
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.className = 'photo-preview';
+        img.onclick = () => {
+          if (confirm('是否刪除此照片？')) {
+            array.splice(idx, 1);
+            renderUploader(elementId, array, max, key);
+          }
+        };
+        el.appendChild(img);
+      });
+
+      if (array.length < max) {
+        const btn = document.createElement('div');
+        btn.className = 'photo-add-btn';
+        btn.innerText = '＋';
+        btn.onclick = () => triggerImageSelect(array, max, () => renderUploader(elementId, array, max, key));
+        el.appendChild(btn);
+      }
+    }
+
+    function triggerImageSelect(targetArray, max, callback) {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 600;
+            let scale = MAX_WIDTH / img.width;
+            if (scale > 1) scale = 1;
+            
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+            targetArray.push(compressedBase64);
+            callback();
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    function saveItem() {
+      const selectedFolderValue = document.getElementById('field-folder-select').value;
+      const targetFolderId = selectedFolderValue === "" ? null : selectedFolderValue;
+
+      const itemData = {
+        id: editingItemId || 'item_' + Date.now(),
+        tab: currentTab,
+        folderId: targetFolderId,
+        category: document.getElementById('field-category').value,
+        itemType: document.getElementById('field-item-type').value,
+      };
+
+      if (currentTab === 'arrived') {
+        itemData.title = document.getElementById('field-title').value;
+        itemData.price = parseFloat(document.getElementById('field-price').value) || 0;
+        itemData.receivedDate = document.getElementById('field-received-date').value;
+        itemData.albumText = document.getElementById('field-album-text').value;
+        itemData.notes = document.getElementById('field-notes').value;
+        itemData.info = document.getElementById('field-info').value;
+        itemData.photos = imgStore.photos;
+        itemData.proofs = imgStore.proofs;
+        itemData.album = imgStore.album;
+      } else {
+        itemData.preTitle = document.getElementById('field-pre-title').value;
+        itemData.prePhotos = imgStore.prePhotos;
+        itemData.preDate = document.getElementById('field-pre-date').value;
+        itemData.preEta = document.getElementById('field-pre-eta').value;
+        itemData.payType = document.getElementById('field-pay-type').value;
+
+        if (itemData.payType === '全付') {
+          itemData.needSecond = document.getElementById('pre-full-need-second').value;
+          itemData.preNotes = document.getElementById('pre-full-notes').value;
+        } else if (itemData.payType === '付一半') {
+          itemData.needSecond = document.getElementById('pre-half-need-second').value;
+          itemData.preNotes = document.getElementById('pre-half-notes').value;
+        } else if (itemData.payType === '未付') {
+          itemData.needSecond = document.getElementById('pre-unpaid-need-second').value;
+          itemData.preNotes = document.getElementById('pre-unpaid-notes').value;
+        } else {
+          itemData.needSecond = '否';
+          itemData.preNotes = document.getElementById('pre-other-notes').value;
+        }
+
+        itemData.fullPrice = parseFloat(document.getElementById('pre-full-price').value) || 0;
+        itemData.fullShipFee = parseFloat(document.getElementById('pre-full-shipfee').value) || 0;
+        itemData.fullTotal = calcFullTotal();
+
+        const halfRes = calcHalfTotal();
+        itemData.halfPrice = parseFloat(document.getElementById('pre-half-total').value) || 0;
+        itemData.halfPaid = parseFloat(document.getElementById('pre-half-paid').value) || 0;
+        itemData.halfShipFee = parseFloat(document.getElementById('pre-half-shipfee').value) || 0;
+        itemData.halfTotal = halfRes.totalWithShip;
+
+        itemData.unpaidPrice = parseFloat(document.getElementById('pre-unpaid-total').value) || 0;
+        itemData.unpaidShipFee = parseFloat(document.getElementById('pre-unpaid-shipfee').value) || 0;
+        itemData.unpaidTotal = calcUnpaidTotal();
+
+        itemData.otherTotal = document.getElementById('pre-other-total').value;
+        itemData.otherPay = document.getElementById('pre-other-paymethod').value;
+        itemData.otherShip = document.getElementById('pre-other-shipmethod').value;
+      }
+
+      const tx = db.transaction("items", "readwrite");
+      tx.objectStore("items").put(itemData);
+      tx.oncomplete = () => {
+        closeModal('modal-item');
+        renderGrid();
+      };
+    }
+
+    function transferPreorderToArrived() {
+      if (!editingItemId) return;
+
+      const tx = db.transaction("items", "readonly");
+      tx.objectStore("items").get(editingItemId).onsuccess = (e) => {
+        const preItem = e.target.result;
+        if (!preItem) return;
+
+        let finalPrice = 0;
+        let infoText = `【原預購明細】\n`;
+        infoText += `下單日期: ${preItem.preDate || '未填'}\n`;
+        infoText += `預計抵達: ${preItem.preEta || '未填'}\n`;
+        infoText += `付款狀態: ${preItem.payType}\n`;
+
+        if (preItem.payType === '全付') {
+          finalPrice = preItem.fullTotal || 0;
+          infoText += `總金額: $${preItem.fullPrice} / 運費: $${preItem.fullShipFee}\n`;
+          infoText += `付款方式: ${document.getElementById('pre-full-paymethod').value}\n`;
+          infoText += `寄送方式: ${document.getElementById('pre-full-shipmethod').value}\n`;
+        } else if (preItem.payType === '付一半') {
+          finalPrice = preItem.halfTotal || 0;
+          infoText += `總金額: $${preItem.halfPrice} / 運費: $${preItem.halfShipFee}\n`;
+          infoText += `已付訂金: $${preItem.halfPaid}\n`;
+          infoText += `付款方式: ${document.getElementById('pre-half-paymethod').value}\n`;
+          infoText += `補款方式: ${document.getElementById('pre-half-remethod').value}\n`;
+          infoText += `寄送方式: ${document.getElementById('pre-half-shipmethod').value}\n`;
+        } else if (preItem.payType === '未付') {
+          finalPrice = preItem.unpaidTotal || 0;
+          infoText += `總金額: $${preItem.unpaidPrice} / 運費: $${preItem.unpaidShipFee}\n`;
+          infoText += `付款方式: ${document.getElementById('pre-unpaid-paymethod').value}\n`;
+          infoText += `寄送方式: ${document.getElementById('pre-unpaid-shipmethod').value}\n`;
+        } else {
+          finalPrice = parseFloat(preItem.otherTotal) || 0;
+          infoText += `總價格: ${preItem.otherTotal}\n`;
+          infoText += `付款方式: ${preItem.otherPay}\n`;
+          infoText += `寄送方式: ${preItem.otherShip}\n`;
+        }
+
+        if (preItem.preNotes) infoText += `備註: ${preItem.preNotes}`;
+
+        const arrivedItem = {
+          id: preItem.id,
+          tab: 'arrived',
+          folderId: preItem.folderId,
+          category: preItem.category,
+          itemType: preItem.itemType,
+          title: preItem.preTitle || preItem.category,
+          price: finalPrice,
+          photos: preItem.prePhotos || [],
+          receivedDate: new Date().toISOString().split('T')[0],
+          proofs: [],
+          album: [],
+          albumText: '',
+          notes: preItem.preNotes || '',
+          info: infoText
+        };
+
+        const writeTx = db.transaction("items", "readwrite");
+        writeTx.objectStore("items").put(arrivedItem);
+        writeTx.oncomplete = () => {
+          alert('已成功轉移至「在家/已到貨」！');
+          closeModal('modal-item');
+          switchTab('arrived');
+        };
+      };
+    }
+
+    function deleteCurrentItem() {
+      if (!editingItemId || !confirm('確定要刪除這個品項嗎？')) return;
+      const tx = db.transaction("items", "readwrite");
+      tx.objectStore("items").delete(editingItemId);
+      tx.oncomplete = () => {
+        closeModal('modal-item');
+        renderGrid();
+      };
+    }
+
+    function backupData() {
+      const tx = db.transaction(["folders", "items"], "readonly");
+      let exportData = { folders: [], items: [] };
+
+      tx.objectStore("folders").getAll().onsuccess = (e) => {
+        exportData.folders = e.target.result;
+        tx.objectStore("items").getAll().onsuccess = (e2) => {
+          exportData.items = e2.target.result;
+          const blob = new Blob([JSON.stringify(exportData)], { type: "application/json" });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `週邊們備份_${new Date().toISOString().split('T')[0]}.json`;
+          a.click();
+        };
+      };
+    }
+
+    function restoreData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            if (data.folders && data.items) {
+              const tx = db.transaction(["folders", "items"], "readwrite");
+              data.folders.forEach(f => tx.objectStore("folders").put(f));
+              data.items.forEach(i => tx.objectStore("items").put(i));
+              tx.oncomplete = () => {
+                alert('還原成功！');
+                renderGrid();
+              };
+            }
+          } catch (err) {
+            alert('檔案格式不正確！');
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+  </script>
+</body>
+</html>
