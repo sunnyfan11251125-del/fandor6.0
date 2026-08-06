@@ -11,6 +11,9 @@
   <link rel="apple-touch-icon" sizes="180x180" id="apple-icon">
   <link rel="icon" type="image/png" id="favicon">
 
+  <!-- 引入 SheetJS 處理原生 .xlsx 匯出 -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
     :root {
       --primary-color: #94B4CB;
@@ -125,6 +128,25 @@
     .calc-box { background: var(--primary-light); padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; color: var(--primary-dark); font-weight: 600; }
     .other-input-block { margin-top: 6px; display: none; }
     .checkbox-inline { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); }
+
+    /* 匯出選單多選框專用樣式 */
+    .checkbox-group-box {
+      background: var(--primary-light);
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .checkbox-group-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -594,11 +616,11 @@
   <div class="modal" id="modal-export">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">📊 匯出收支表 (Excel / CSV)</div>
+        <div class="modal-title">📊 匯出收支表 (Excel)</div>
         <button class="close-btn" onclick="closeModal('modal-export')">✕</button>
       </div>
       <div class="form-group">
-        <label>匯出範圍</label>
+        <label>1. 匯出範圍</label>
         <select id="export-range" class="form-control">
           <option value="all">全部品項 (現貨 + 預購)</option>
           <option value="arrived">僅現貨 (在家/已到貨)</option>
@@ -607,26 +629,30 @@
         </select>
       </div>
       <div class="form-group">
-        <label>特定週邊分類</label>
-        <select id="export-category" class="form-control">
-          <option value="all">全部分類</option>
-          <option value="專輯/EP">專輯/EP</option>
-          <option value="巡演場週">巡演場週</option>
-          <option value="團體公司週邊">團體公司週邊</option>
-          <option value="單人公司週邊">單人公司週邊</option>
-          <option value="節目週邊">節目週邊</option>
-          <option value="快閃店/展覽限定">快閃店/展覽限定</option>
-          <option value="生日/紀念日限定">生日/紀念日限定</option>
-          <option value="粉絲應援/站姐週邊">粉絲應援/站姐週邊</option>
-          <option value="其他">其他</option>
-        </select>
+        <label>2. 週邊分類 (可複選)</label>
+        <div class="checkbox-group-box">
+          <label class="checkbox-group-item">
+            <input type="checkbox" id="export-cat-all" checked onchange="toggleExportCatAll(this)">
+            <strong>[全部] (勾選此項代表不限分類)</strong>
+          </label>
+          <hr style="border:none; border-top:1px solid var(--border-color); margin:2px 0;">
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="專輯/EP" onchange="toggleExportCatSub()"> 專輯/EP</label>
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="巡演場週" onchange="toggleExportCatSub()"> 巡演場週</label>
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="團體公司週邊" onchange="toggleExportCatSub()"> 團體公司週邊</label>
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="單人公司週邊" onchange="toggleExportCatSub()"> 單人公司週邊</label>
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="節目週邊" onchange="toggleExportCatSub()"> 節目週邊</label>
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="快閃店/展覽限定" onchange="toggleExportCatSub()"> 快閃店/展覽限定</label>
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="生日/紀念日限定" onchange="toggleExportCatSub()"> 生日/紀念日限定</label>
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="粉絲應援/站姐週邊" onchange="toggleExportCatSub()"> 粉絲應援/站姐週邊</label>
+          <label class="checkbox-group-item"><input type="checkbox" class="export-cat-option" value="其他" onchange="toggleExportCatSub()"> 其他</label>
+        </div>
       </div>
       <div class="form-group">
         <label class="checkbox-inline">
           <input type="checkbox" id="export-include-sold"> 包含已售出紀錄
         </label>
       </div>
-      <button class="btn-submit" onclick="executeExportCsv()">下載 Excel (CSV) 收支表</button>
+      <button class="btn-submit" onclick="executeExportXlsx()">下載原生 Excel (.xlsx) 收支表</button>
     </div>
   </div>
 
@@ -712,7 +738,7 @@
       renderGrid();
     }
 
-    // --- Render Items & Folders ---
+    // --- Render Items & Folders (搜尋時自動隱藏資料夾，乾淨列出商品) ---
     function renderGrid() {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
@@ -730,8 +756,11 @@
       folderStore.openCursor().onsuccess = (e) => {
         const cursor = e.target.result;
         if (cursor) {
-          if (cursor.value.tab === currentTab && cursor.value.parentId === currentFolderId) {
-            folders.push(cursor.value);
+          // 只有在「沒有搜尋關鍵字」時，才顯示當前層級的資料夾
+          if (!searchKeyword) {
+            if (cursor.value.tab === currentTab && cursor.value.parentId === currentFolderId) {
+              folders.push(cursor.value);
+            }
           }
           cursor.continue();
         } else {
@@ -739,20 +768,28 @@
             const cursor2 = e2.target.result;
             if (cursor2) {
               const val = cursor2.value;
-              // Ignore sold items in main grid
               if (!val.isSold) {
-                if (currentTab === 'forsale') {
-                  if (val.isForsale && val.forsaleFolderId === currentFolderId) items.push(val);
-                } else if (val.tab === currentTab && val.folderId === currentFolderId) {
-                  items.push(val);
+                // 如果有搜尋關鍵字，無視資料夾層級，全域搜尋該分頁所有符合的品項
+                if (searchKeyword) {
+                  const matchTab = (currentTab === 'forsale') ? val.isForsale : (val.tab === currentTab);
+                  if (matchTab) {
+                    items.push(val);
+                  }
+                } else {
+                  // 無搜尋時，照原本資料夾層級顯示
+                  if (currentTab === 'forsale') {
+                    if (val.isForsale && val.forsaleFolderId === currentFolderId) items.push(val);
+                  } else if (val.tab === currentTab && val.folderId === currentFolderId) {
+                    items.push(val);
+                  }
                 }
               }
               cursor2.continue();
             } else {
-              // Apply Filter & Sort
+              // 關鍵字過濾商品
               if (searchKeyword) {
                 items = items.filter(i => {
-                  const t = (i.title || i.preTitle || '') + (i.category || '') + (i.notes || '') + (i.info || '') + (i.albumText || '');
+                  const t = (i.title || i.preTitle || '') + (i.category || '') + (i.itemType || '') + (i.notes || '') + (i.info || '') + (i.albumText || '');
                   return t.toLowerCase().includes(searchKeyword);
                 });
               }
@@ -1402,38 +1439,67 @@
       };
     }
 
-    // --- Export CSV / Excel ---
+    // --- Export Excel (複選分類連動 + SheetJS 原生 .xlsx 匯出) ---
     function openExportModal() { openModal('modal-export'); }
 
-    function executeExportCsv() {
+    function toggleExportCatAll(allCb) {
+      const options = document.querySelectorAll('.export-cat-option');
+      if (allCb.checked) {
+        options.forEach(cb => cb.checked = false);
+      }
+    }
+
+    function toggleExportCatSub() {
+      const allCb = document.getElementById('export-cat-all');
+      const options = document.querySelectorAll('.export-cat-option');
+      let hasCheckedSub = false;
+      options.forEach(cb => {
+        if (cb.checked) hasCheckedSub = true;
+      });
+
+      if (hasCheckedSub) {
+        allCb.checked = false;
+      } else {
+        allCb.checked = true;
+      }
+    }
+
+    function executeExportXlsx() {
       const range = document.getElementById('export-range').value;
-      const categoryFilter = document.getElementById('export-category').value;
       const includeSold = document.getElementById('export-include-sold').checked;
+      const isAllCat = document.getElementById('export-cat-all').checked;
+
+      // 取得勾選的特定分類
+      let selectedCategories = [];
+      if (!isAllCat) {
+        document.querySelectorAll('.export-cat-option:checked').forEach(cb => {
+          selectedCategories.push(cb.value);
+        });
+      }
 
       const tx = db.transaction("items", "readonly");
       tx.objectStore("items").getAll().onsuccess = (e) => {
         let items = e.target.result;
 
-        // Filter Sold
+        // 1. 過濾售出狀態
         if (!includeSold) items = items.filter(i => !i.isSold);
 
-        // Filter Range
+        // 2. 過濾範圍
         if (range === 'arrived') items = items.filter(i => i.tab === 'arrived');
         if (range === 'preorder') items = items.filter(i => i.tab === 'preorder');
         if (range === 'forsale') items = items.filter(i => i.isForsale);
 
-        // Filter Category
-        if (categoryFilter !== 'all') items = items.filter(i => i.category === categoryFilter);
+        // 3. 過濾複選分類
+        if (!isAllCat && selectedCategories.length > 0) {
+          items = items.filter(i => selectedCategories.includes(i.category));
+        }
 
-        // Construct 10-Column CSV
-        let csvContent = "\uFEFF"; // UTF-8 BOM for Excel Chinese support
-        csvContent += "狀態,分類,品項,名稱,日期,商品金額,運費,二補金額,總支出,待付金額\n";
-
-        items.forEach(i => {
+        // 構建 SheetJS 資料陣列 (JSON 二維資料)
+        const excelData = items.map(i => {
           const status = i.isSold ? '已售出' : (i.tab === 'arrived' ? '在家' : '預購');
           const category = i.category || '';
           const itemType = i.itemType || '';
-          const name = (i.title || i.preTitle || '').replace(/,/g, ' ');
+          const name = i.title || i.preTitle || '';
           const date = i.receivedDate || i.preDate || '';
 
           let itemCost = 0; let shipFee = 0; let secondFee = 0; let unpaidAmount = 0;
@@ -1453,14 +1519,38 @@
           }
 
           const totalCost = itemCost + shipFee + secondFee;
-          csvContent += `"${status}","${category}","${itemType}","${name}","${date}",${itemCost},${shipFee},${secondFee},${totalCost},${unpaidAmount}\n`;
+
+          return {
+            "狀態": status,
+            "分類": category,
+            "品項": itemType,
+            "名稱": name,
+            "日期": date,
+            "商品金額": itemCost,
+            "運費": shipFee,
+            "二補金額": secondFee,
+            "總支出": totalCost,
+            "待付金額": unpaidAmount
+          };
         });
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `週邊們_收支表_${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
+        if (excelData.length === 0) {
+          alert('當前選擇的條件下沒有資料可以匯出！');
+          return;
+        }
+
+        // 使用 SheetJS 建立工作表並導出原生 .xlsx 檔案
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "週邊明細");
+
+        // 自動調整欄寬
+        const max_width = excelData.reduce((w, r) => Math.max(w, r.名稱 ? r.名稱.length : 10), 10);
+        worksheet['!cols'] = [ { wch: 8 }, { wch: 15 }, { wch: 10 }, { wch: Math.min(max_width + 5, 30) }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(workbook, `週邊們_收支表_${todayStr}.xlsx`);
+
         closeModal('modal-export');
       };
     }
@@ -1485,7 +1575,8 @@
 
     function restoreData() {
       const input = document.createElement('input');
-      input.type = 'file'; input.accept = 'application/json';
+      input.type = 'file';
+      input.accept = 'application/json';
       input.onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -1493,17 +1584,45 @@
         reader.onload = (event) => {
           try {
             const data = JSON.parse(event.target.result);
-            if (data.folders && data.items) {
+            
+            // 判斷是否為合法的備份結構
+            if (data && (Array.isArray(data.items) || Array.isArray(data.folders))) {
               const tx = db.transaction(["folders", "items"], "readwrite");
-              data.folders.forEach(f => tx.objectStore("folders").put(f));
-              data.items.forEach(i => tx.objectStore("items").put(i));
+              const folderStore = tx.objectStore("folders");
+              const itemStore = tx.objectStore("items");
+
+              // 還原資料夾
+              if (Array.isArray(data.folders)) {
+                data.folders.forEach(f => {
+                  if (!f.tab) f.tab = 'arrived';
+                  if (!f.parentId) f.parentId = null;
+                  folderStore.put(f);
+                });
+              }
+
+              // 還原品項（自動補齊舊版本欠缺的新欄位）
+              if (Array.isArray(data.items)) {
+                data.items.forEach(i => {
+                  if (i.isForsale === undefined) i.isForsale = false;
+                  if (i.isSold === undefined) i.isSold = false;
+                  if (!i.tab) i.tab = 'arrived';
+                  if (!i.folderId) i.folderId = null;
+                  itemStore.put(i);
+                });
+              }
+
               tx.oncomplete = () => {
-                alert('還原成功！'); renderGrid();
+                alert('還原成功！舊資料已順利升級並匯入。');
+                renderGrid();
               };
+            } else {
+              alert('格式不符：請確認選擇的是副檔名為 .json 的備份檔案！');
             }
-          } catch (err) { alert('檔案格式不正確！'); }
+          } catch (err) {
+            alert('解析失敗：檔案可能已損壞或格式不符。');
+          }
         };
-        reader.readAsDataURL(file);
+        reader.readAsText(file); // 確保用 UTF-8 文字讀取 JSON
       };
       input.click();
     }
