@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>週邊們</title>
   
-  <!-- iOS PWA 桌面 Icon：直接內嵌 100% 真正的白底藍蝴蝶結 PNG Base64 圖檔 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="週邊們">
-  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSU24ErkJggg==" id="apple-icon">
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSU24ErkJggg==" id="favicon">
+  <link rel="apple-touch-icon" sizes="180x180" id="apple-icon">
+  <link rel="icon" type="image/png" id="favicon">
 
   <style>
     :root {
@@ -23,49 +22,43 @@
       --text-sub: #7f8c8d;
       --border-color: #e2e8f0;
       --danger-color: #e74c3c;
+      --success-color: #2ecc71;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 90px; }
 
-    /* Header & Logo */
     header {
       background: var(--card-bg);
       position: sticky; top: 0; z-index: 100;
       border-bottom: 1px solid var(--border-color);
       padding: 12px 16px;
       box-shadow: 0 2px 10px rgba(148, 180, 203, 0.1);
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .header-title-box { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; }
-    
-    .header-logo-box {
-      width: 28px; height: 28px;
-      background: #ffffff;
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
+    .header-title-box { display: flex; align-items: center; gap: 8px; }
+    .header-logo-box { width: 28px; height: 28px; border-radius: 6px; overflow: hidden; background: #fff; }
     .header-logo-box canvas { width: 100%; height: 100%; }
+    .header-title { font-size: 1.15rem; font-weight: 700; color: var(--primary-dark); }
+    .settings-btn { border: none; background: none; font-size: 1.2rem; cursor: pointer; color: var(--primary-dark); }
 
-    .header-title { font-size: 1.15rem; font-weight: 700; color: var(--primary-dark); letter-spacing: 0.5px; }
-    
-    /* Tabs */
-    .tabs { display: flex; background: var(--primary-light); border-radius: 12px; padding: 3px; }
+    .tabs { display: flex; background: var(--primary-light); border-radius: 12px; padding: 3px; margin: 10px 16px 0 16px; }
     .tab-btn {
       flex: 1; border: none; background: transparent; padding: 8px 0;
-      font-size: 0.9rem; font-weight: 600; color: var(--text-sub);
+      font-size: 0.85rem; font-weight: 600; color: var(--text-sub);
       border-radius: 9px; cursor: pointer; transition: all 0.2s ease;
     }
     .tab-btn.active { background: var(--card-bg); color: var(--primary-dark); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
 
-    /* Breadcrumbs Nav */
-    .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+    .search-bar-box { padding: 10px 16px 0 16px; display: flex; gap: 8px; }
+    .search-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.85rem; outline: none; }
+    .sort-select { padding: 8px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.8rem; background: #fff; color: var(--text-main); }
+
+    .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; font-size: 0.85rem; }
     .breadcrumbs { color: var(--primary-dark); font-weight: 600; overflow-x: auto; white-space: nowrap; }
     .breadcrumbs span { cursor: pointer; text-decoration: underline; }
 
-    /* Main Container */
-    .container { padding: 16px; }
+    .container { padding: 0 16px 16px 16px; }
     .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     
     .card {
@@ -81,22 +74,21 @@
     .badge-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
     .badge { display: inline-block; padding: 2px 6px; background: var(--primary-light); color: var(--primary-dark); border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
     .badge-danger { background: #fde8e8; color: var(--danger-color); }
+    .badge-success { background: #e8f8f0; color: var(--success-color); }
 
-    /* Floating Action Bar */
     .fab-bar {
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 12px; background: var(--card-bg); padding: 8px 16px;
+      display: flex; gap: 10px; background: var(--card-bg); padding: 8px 16px;
       border-radius: 30px; box-shadow: 0 6px 20px rgba(148, 180, 203, 0.3);
       border: 1px solid var(--border-color); z-index: 99;
     }
     .fab-btn {
       border: none; background: var(--primary-color); color: white;
-      padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.85rem;
+      padding: 8px 14px; border-radius: 20px; font-weight: 600; font-size: 0.8rem;
       cursor: pointer;
     }
     .fab-btn.secondary { background: var(--primary-light); color: var(--primary-dark); }
 
-    /* Modal Form */
     .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
     .modal.active { display: flex; }
     .modal-content {
@@ -108,7 +100,6 @@
     .modal-title { font-weight: 700; color: var(--primary-dark); }
     .close-btn { border: none; background: none; font-size: 1.2rem; color: var(--text-sub); cursor: pointer; }
 
-    /* Form Fields */
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
     .form-control {
@@ -127,16 +118,18 @@
     }
 
     .btn-submit { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
-    .btn-transfer { width: 100%; padding: 12px; background: #4caf50; color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
+    .btn-transfer { width: 100%; padding: 12px; background: var(--success-color); color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
+    .btn-sell { width: 100%; padding: 12px; background: #f39c12; color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
     .btn-delete { width: 100%; padding: 10px; background: transparent; color: var(--danger-color); border: none; font-size: 0.85rem; margin-top: 5px; cursor: pointer; }
 
     .calc-box { background: var(--primary-light); padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; color: var(--primary-dark); font-weight: 600; }
     .other-input-block { margin-top: 6px; display: none; }
+    .checkbox-inline { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); }
   </style>
 </head>
 <body>
 
-  <!-- Header Section -->
+  <!-- Header -->
   <header>
     <div class="header-title-box">
       <div class="header-logo-box">
@@ -144,22 +137,34 @@
       </div>
       <span class="header-title">週邊們</span>
     </div>
-    <div class="tabs">
-      <button class="tab-btn active" id="tab-arrived" onclick="switchTab('arrived')">在家/已到貨</button>
-      <button class="tab-btn" id="tab-preorder" onclick="switchTab('preorder')">預購（未到貨）</button>
-    </div>
+    <button class="settings-btn" onclick="openModal('modal-settings')">⚙️</button>
   </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-arrived" onclick="switchTab('arrived')">在家/已到貨</button>
+    <button class="tab-btn" id="tab-preorder" onclick="switchTab('preorder')">預購（未到貨）</button>
+    <button class="tab-btn" id="tab-forsale" onclick="switchTab('forsale')">待售專區</button>
+  </div>
+
+  <!-- Search & Sort -->
+  <div class="search-bar-box">
+    <input type="text" id="search-input" class="search-input" placeholder="搜尋品項、分類、備註..." oninput="renderGrid()">
+    <select id="sort-select" class="sort-select" onchange="renderGrid()">
+      <option value="default">預設排序</option>
+      <option value="date-desc">日期：新 ➔ 舊</option>
+      <option value="date-asc">日期：舊 ➔ 新</option>
+      <option value="price-desc">價格：高 ➔ 低</option>
+      <option value="price-asc">價格：低 ➔ 高</option>
+    </select>
+  </div>
 
   <!-- Breadcrumbs Nav -->
   <div class="nav-bar">
     <div class="breadcrumbs" id="breadcrumbs">路徑: <span>主目錄</span></div>
-    <div>
-      <button onclick="backupData()" style="border:none; background:none; font-size:0.75rem; color:var(--text-sub); text-decoration:underline;">備份</button>
-      <button onclick="restoreData()" style="border:none; background:none; font-size:0.75rem; color:var(--text-sub); text-decoration:underline; margin-left:6px;">還原</button>
-    </div>
   </div>
 
-  <!-- Container -->
+  <!-- Main Container -->
   <div class="container">
     <div class="grid" id="grid-container"></div>
   </div>
@@ -168,20 +173,44 @@
   <div class="fab-bar">
     <button class="fab-btn secondary" onclick="openFolderModal()">新增資料夾</button>
     <button class="fab-btn" onclick="openItemModal()">新增品項</button>
+    <button class="fab-btn secondary" onclick="openExportModal()">📊 匯出 Excel</button>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="modal-settings">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">系統設定與歷史記錄</div>
+        <button class="close-btn" onclick="closeModal('modal-settings')">✕</button>
+      </div>
+      <button class="btn-submit" style="background:var(--primary-dark);" onclick="openSoldArchiveModal()">📦 查看已售出歸檔庫</button>
+      <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border-color);">
+      <button class="btn-submit" style="background:#34495e;" onclick="backupData()">💾 備份資料 (JSON)</button>
+      <button class="btn-submit" style="background:#7f8c8d; margin-top:8px;" onclick="restoreData()">🔄 還原資料 (JSON)</button>
+    </div>
   </div>
 
   <!-- Folder Modal -->
   <div class="modal" id="modal-folder">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">新增資料夾</div>
+        <div class="modal-title" id="folder-modal-title">新增/編輯資料夾</div>
         <button class="close-btn" onclick="closeModal('modal-folder')">✕</button>
       </div>
       <div class="form-group">
         <label>資料夾名稱</label>
         <input type="text" id="folder-name" class="form-control" placeholder="例如：專輯專區、巡演週邊">
       </div>
+      <div class="form-group">
+        <label>上層資料夾 (手動搬家/層級)</label>
+        <select id="folder-parent-select" class="form-control"></select>
+      </div>
+      <div class="form-group">
+        <label>自訂封面照片 (選填，無上傳則不顯示封面)</label>
+        <div class="photo-uploader" id="uploader-folder-cover"></div>
+      </div>
       <button class="btn-submit" onclick="saveFolder()">儲存資料夾</button>
+      <button class="btn-delete" id="btn-delete-folder" style="display:none;" onclick="deleteCurrentFolder()">刪除資料夾</button>
     </div>
   </div>
 
@@ -194,7 +223,19 @@
       </div>
       
       <form id="item-form" onsubmit="event.preventDefault();">
-        <!-- 所屬資料夾選擇 -->
+        <!-- 待售標籤勾選 -->
+        <div class="form-group" style="background:var(--primary-light); padding:10px; border-radius:8px;">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="field-is-forsale" onchange="toggleForsaleFolderGroup()"> 🏷️ 加入「待售專區」
+          </label>
+        </div>
+
+        <div class="form-group" id="group-forsale-folder" style="display:none;">
+          <label>待售區專屬分類/資料夾</label>
+          <select id="field-forsale-folder-select" class="form-control"></select>
+        </div>
+
+        <!-- 所屬資料夾選擇（樹狀呈現） -->
         <div class="form-group">
           <label>所屬資料夾 (可手動移動位置)</label>
           <select id="field-folder-select" class="form-control"></select>
@@ -219,6 +260,7 @@
           <label id="label-item-type">2. 品項</label>
           <select id="field-item-type" class="form-control">
             <option value="專輯">專輯</option>
+            <option value="娃">娃</option>
             <option value="玩偶">玩偶</option>
             <option value="擺飾">擺飾</option>
             <option value="家居">家居</option>
@@ -291,13 +333,17 @@
             <label>5. 預計抵達時間</label>
             <input type="text" id="field-pre-eta" class="form-control" placeholder="例如：2026年10月下旬">
           </div>
+          <div class="form-group">
+            <label>購買證明 (照片)</label>
+            <div class="photo-uploader" id="uploader-pre-proofs"></div>
+          </div>
 
           <!-- 付款狀態選單 -->
           <div class="form-group">
             <label>6. 付款狀態選擇</label>
             <select id="field-pay-type" class="form-control" onchange="togglePaymentFlow()">
               <option value="全付">全付</option>
-              <option value="付一半">付一半（訂金/二補）</option>
+              <option value="付一半（訂金）">付一半（訂金）</option>
               <option value="未付">未付</option>
               <option value="其他">其他</option>
             </select>
@@ -341,7 +387,7 @@
             </div>
           </div>
 
-          <!-- 分支 2: 付一半 -->
+          <!-- 分支 2: 付一半（訂金） -->
           <div id="flow-half" class="flow-block" style="display:none;">
             <div class="form-group">
               <label>1. 總金額（不含運） (必填)</label>
@@ -456,83 +502,169 @@
 
         <!-- 按鈕群組 -->
         <button type="button" class="btn-submit" onclick="saveItem()">儲存此品項</button>
-        <button type="button" id="btn-transfer-action" class="btn-transfer" style="display:none;" onclick="transferPreorderToArrived()">已到貨，轉移至「在家/已到貨」</button>
-        <button type="button" id="btn-delete-action" class="btn-delete" style="display:none;" onclick="deleteCurrentItem()">刪除此品項</button>
+        <button type="button" id="btn-transfer-action" class="btn-transfer" style="display:none;" onclick="openTransferModal()">已到貨，轉移至「在家/已到貨」</button>
+        <button type="button" id="btn-sell-action" class="btn-sell" style="display:none;" onclick="openSellModal()">💰 標記為「已售出」</button>
+        <button type="button" id="btn-remove-forsale-action" class="btn-delete" style="display:none; color:#f39c12;" onclick="removeForsaleStatus()">僅取消待售狀態</button>
+        <button type="button" id="btn-delete-action" class="btn-delete" style="display:none;" onclick="deleteCurrentItem()">徹底刪除此品項</button>
       </form>
     </div>
   </div>
 
+  <!-- Transfer Dialog Modal -->
+  <div class="modal" id="modal-transfer-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">轉移至「在家/已到貨」設定</div>
+        <button class="close-btn" onclick="closeModal('modal-transfer-dialog')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>存放目標資料夾</label>
+        <select id="transfer-target-folder" class="form-control"></select>
+      </div>
+      <div class="form-group">
+        <label>二補金額 (若無補款填 0)</label>
+        <input type="number" id="transfer-second-fee" class="form-control" value="0">
+      </div>
+      <button class="btn-transfer" onclick="executeTransferToArrived()">確認轉移</button>
+    </div>
+  </div>
+
+  <!-- Sell Item Dialog Modal -->
+  <div class="modal" id="modal-sell-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">標記為已售出</div>
+        <button class="close-btn" onclick="closeModal('modal-sell-dialog')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>售出價格</label>
+        <input type="number" id="sell-price" class="form-control" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>售出平台</label>
+        <select id="sell-platform" class="form-control" onchange="checkOtherField(this, 'sell-platform-other')">
+          <option value="賣貨便">賣貨便</option>
+          <option value="蝦皮">蝦皮</option>
+          <option value="FB社團">FB社團</option>
+          <option value="推特/X">推特/X</option>
+          <option value="IG">IG</option>
+          <option value="Threads">Threads</option>
+          <option value="面交">面交</option>
+          <option value="其他">其他</option>
+        </select>
+        <input type="text" id="sell-platform-other" class="form-control other-input-block" placeholder="請填寫平台名稱">
+      </div>
+      <div class="form-group">
+        <label>買家資訊</label>
+        <select id="sell-buyer-type" class="form-control" onchange="checkOtherField(this, 'sell-buyer-other')">
+          <option value="買家暱稱">買家暱稱</option>
+          <option value="訂單編號/單號">訂單編號/單號</option>
+          <option value="其他">其他</option>
+        </select>
+        <input type="text" id="sell-buyer-info" class="form-control" placeholder="填寫暱稱或單號..." style="margin-top:4px;">
+        <input type="text" id="sell-buyer-other" class="form-control other-input-block" placeholder="請填寫其他資訊欄位名稱">
+      </div>
+      <div class="form-group">
+        <label>買家交易憑證/截圖 (1-3張)</label>
+        <div class="photo-uploader" id="uploader-sell-proofs"></div>
+      </div>
+      <div class="form-group">
+        <label>出貨/售出日期</label>
+        <input type="date" id="sell-date" class="form-control">
+      </div>
+      <button class="btn-sell" onclick="executeMarkAsSold()">確認售出並歸檔</button>
+    </div>
+  </div>
+
+  <!-- Sold Archive Modal -->
+  <div class="modal" id="modal-sold-archive">
+    <div class="modal-content" style="max-height:92vh;">
+      <div class="modal-header">
+        <div class="modal-title">📦 已售出歸檔庫</div>
+        <button class="close-btn" onclick="closeModal('modal-sold-archive')">✕</button>
+      </div>
+      <div class="form-group">
+        <input type="text" id="sold-search-input" class="search-input" placeholder="在已售出項目中搜尋..." oninput="renderSoldArchiveList()">
+      </div>
+      <div id="sold-archive-list" class="grid" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- Export Excel Options Modal -->
+  <div class="modal" id="modal-export">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">📊 匯出收支表 (Excel / CSV)</div>
+        <button class="close-btn" onclick="closeModal('modal-export')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>匯出範圍</label>
+        <select id="export-range" class="form-control">
+          <option value="all">全部品項 (現貨 + 預購)</option>
+          <option value="arrived">僅現貨 (在家/已到貨)</option>
+          <option value="preorder">僅預購 (未到貨)</option>
+          <option value="forsale">僅待售專區品項</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>特定週邊分類</label>
+        <select id="export-category" class="form-control">
+          <option value="all">全部分類</option>
+          <option value="專輯/EP">專輯/EP</option>
+          <option value="巡演場週">巡演場週</option>
+          <option value="團體公司週邊">團體公司週邊</option>
+          <option value="單人公司週邊">單人公司週邊</option>
+          <option value="節目週邊">節目週邊</option>
+          <option value="快閃店/展覽限定">快閃店/展覽限定</option>
+          <option value="生日/紀念日限定">生日/紀念日限定</option>
+          <option value="粉絲應援/站姐週邊">粉絲應援/站姐週邊</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="checkbox-inline">
+          <input type="checkbox" id="export-include-sold"> 包含已售出紀錄
+        </label>
+      </div>
+      <button class="btn-submit" onclick="executeExportCsv()">下載 Excel (CSV) 收支表</button>
+    </div>
+  </div>
+
   <script>
-    // --- 在前端動態即時生成 100% 真正的白底藍蝴蝶結 PNG ---
+    // --- Canvas PNG Generator for iOS Icon ---
     function generatePngLogo() {
       const canvas = document.createElement('canvas');
-      canvas.width = 180;
-      canvas.height = 180;
+      canvas.width = 180; canvas.height = 180;
       const ctx = canvas.getContext('2d');
 
-      // 1. 純白底色
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, 180, 180);
-
-      // 2. 畫左邊蝴蝶結翅膀
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, 180, 180);
       ctx.fillStyle = '#94B4CB';
-      ctx.beginPath();
-      ctx.moveTo(90, 85);
-      ctx.bezierCurveTo(50, 35, 15, 55, 35, 95);
-      ctx.bezierCurveTo(55, 130, 82, 105, 90, 95);
-      ctx.fill();
+      ctx.beginPath(); ctx.moveTo(90, 85); ctx.bezierCurveTo(50, 35, 15, 55, 35, 95); ctx.bezierCurveTo(55, 130, 82, 105, 90, 95); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(90, 85); ctx.bezierCurveTo(130, 35, 165, 55, 145, 95); ctx.bezierCurveTo(125, 130, 98, 105, 90, 95); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(90, 92); ctx.bezierCurveTo(70, 125, 35, 145, 50, 155); ctx.bezierCurveTo(75, 135, 88, 115, 90, 100); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(90, 92); ctx.bezierCurveTo(110, 125, 145, 145, 130, 155); ctx.bezierCurveTo(105, 135, 92, 115, 90, 100); ctx.fill();
+      ctx.fillStyle = '#6a8ea8'; ctx.beginPath(); ctx.arc(90, 91, 10, 0, Math.PI * 2); ctx.fill();
 
-      // 3. 畫右邊蝴蝶結翅膀
-      ctx.beginPath();
-      ctx.moveTo(90, 85);
-      ctx.bezierCurveTo(130, 35, 165, 55, 145, 95);
-      ctx.bezierCurveTo(125, 130, 98, 105, 90, 95);
-      ctx.fill();
-
-      // 4. 下方緞帶飄帶
-      ctx.beginPath();
-      ctx.moveTo(90, 92);
-      ctx.bezierCurveTo(70, 125, 35, 145, 50, 155);
-      ctx.bezierCurveTo(75, 135, 88, 115, 90, 100);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(90, 92);
-      ctx.bezierCurveTo(110, 125, 145, 145, 130, 155);
-      ctx.bezierCurveTo(105, 135, 92, 115, 90, 100);
-      ctx.fill();
-
-      // 5. 中間藍色結點
-      ctx.fillStyle = '#6a8ea8';
-      ctx.beginPath();
-      ctx.arc(90, 91, 10, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 轉成真正的 PNG Data URL 並注入 apple-touch-icon
       const pngDataUrl = canvas.toDataURL('image/png');
       document.getElementById('apple-icon').href = pngDataUrl;
       document.getElementById('favicon').href = pngDataUrl;
 
-      // 順便渲染到頂部 Header 的小卡
       const headerCanvas = document.getElementById('header-logo-canvas');
-      if (headerCanvas) {
-        const hCtx = headerCanvas.getContext('2d');
-        hCtx.drawImage(canvas, 0, 0);
-      }
+      if (headerCanvas) headerCanvas.getContext('2d').drawImage(canvas, 0, 0);
     }
-
-    // 頁面載入時立刻繪製生成的真正的 PNG
     generatePngLogo();
 
+    // --- State & IndexedDB Init ---
     let db;
-    let currentTab = 'arrived';
+    let currentTab = 'arrived'; // 'arrived', 'preorder', 'forsale'
     let currentFolderId = null;
     let folderPath = [];
     let editingItemId = null;
+    let editingFolderId = null;
 
-    let imgStore = { photos: [], proofs: [], album: [], prePhotos: [] };
+    let imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [], sellProofs: [], folderCover: [] };
 
-    const request = indexedDB.open("MerchCollectorDB", 2);
+    const request = indexedDB.open("MerchCollectorDB_v3", 1);
     request.onupgradeneeded = (e) => {
       db = e.target.result;
       if (!db.objectStoreNames.contains("folders")) db.createObjectStore("folders", { keyPath: "id" });
@@ -547,6 +679,7 @@
       currentTab = tab;
       document.getElementById('tab-arrived').classList.toggle('active', tab === 'arrived');
       document.getElementById('tab-preorder').classList.toggle('active', tab === 'preorder');
+      document.getElementById('tab-forsale').classList.toggle('active', tab === 'forsale');
       currentFolderId = null;
       folderPath = [];
       updateBreadcrumbs();
@@ -564,11 +697,9 @@
 
     function navigateToFolder(folderId, folderName) {
       if (folderId === null) {
-        currentFolderId = null;
-        folderPath = [];
+        currentFolderId = null; folderPath = [];
       } else {
-        currentFolderId = folderId;
-        folderPath.push({ id: folderId, name: folderName });
+        currentFolderId = folderId; folderPath.push({ id: folderId, name: folderName });
       }
       updateBreadcrumbs();
       renderGrid();
@@ -581,9 +712,13 @@
       renderGrid();
     }
 
+    // --- Render Items & Folders ---
     function renderGrid() {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
+
+      const searchKeyword = document.getElementById('search-input').value.trim().toLowerCase();
+      const sortType = document.getElementById('sort-select').value;
 
       const tx = db.transaction(["folders", "items"], "readonly");
       const folderStore = tx.objectStore("folders");
@@ -603,16 +738,42 @@
           itemStore.openCursor().onsuccess = (e2) => {
             const cursor2 = e2.target.result;
             if (cursor2) {
-              if (cursor2.value.tab === currentTab && cursor2.value.folderId === currentFolderId) {
-                items.push(cursor2.value);
+              const val = cursor2.value;
+              // Ignore sold items in main grid
+              if (!val.isSold) {
+                if (currentTab === 'forsale') {
+                  if (val.isForsale && val.forsaleFolderId === currentFolderId) items.push(val);
+                } else if (val.tab === currentTab && val.folderId === currentFolderId) {
+                  items.push(val);
+                }
               }
               cursor2.continue();
             } else {
+              // Apply Filter & Sort
+              if (searchKeyword) {
+                items = items.filter(i => {
+                  const t = (i.title || i.preTitle || '') + (i.category || '') + (i.notes || '') + (i.info || '') + (i.albumText || '');
+                  return t.toLowerCase().includes(searchKeyword);
+                });
+              }
+              sortItemList(items, sortType);
               displayGridElements(folders, items);
             }
           };
         }
       };
+    }
+
+    function sortItemList(items, sortType) {
+      if (sortType === 'date-desc') {
+        items.sort((a,b) => new Date(b.receivedDate || b.preDate || 0) - new Date(a.receivedDate || a.preDate || 0));
+      } else if (sortType === 'date-asc') {
+        items.sort((a,b) => new Date(a.receivedDate || a.preDate || 0) - new Date(b.receivedDate || b.preDate || 0));
+      } else if (sortType === 'price-desc') {
+        items.sort((a,b) => (b.price || b.fullTotal || 0) - (a.price || a.fullTotal || 0));
+      } else if (sortType === 'price-asc') {
+        items.sort((a,b) => (a.price || a.fullTotal || 0) - (b.price || b.fullTotal || 0));
+      }
     }
 
     function displayGridElements(folders, items) {
@@ -622,10 +783,19 @@
         const div = document.createElement('div');
         div.className = 'card card-folder';
         div.onclick = () => navigateToFolder(f.id, f.name);
+        
+        let coverHtml = `<div style="font-size: 1.8rem; text-align:center; margin: 8px 0; color:var(--primary-color);">資料夾</div>`;
+        if (f.coverPhoto) {
+          coverHtml = `<img src="${f.coverPhoto}" class="card-img" alt="封面" loading="lazy">`;
+        }
+
         div.innerHTML = `
-          <div style="font-size: 1.8rem; text-align:center; margin: 8px 0; color:var(--primary-color);">資料夾</div>
+          ${coverHtml}
           <div class="card-title">${f.name}</div>
-          <div class="card-sub">資料夾</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="card-sub">資料夾</span>
+            <button onclick="event.stopPropagation(); openFolderModal('${f.id}')" style="border:none; background:none; font-size:0.75rem; color:var(--text-sub);">編輯</button>
+          </div>
         `;
         container.appendChild(div);
       });
@@ -636,17 +806,15 @@
         div.onclick = () => openItemModal(item);
         
         let coverImg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="%2394B4CB"><rect width="100" height="100" fill="%23eef4f8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="%2394B4CB">無圖片</text></svg>';
-        
-        if (item.tab === 'arrived' && item.photos && item.photos.length > 0) coverImg = item.photos[0];
-        if (item.tab === 'preorder' && item.prePhotos && item.prePhotos.length > 0) coverImg = item.prePhotos[0];
+        if (item.photos && item.photos.length > 0) coverImg = item.photos[0];
+        if (item.prePhotos && item.prePhotos.length > 0) coverImg = item.prePhotos[0];
 
-        const title = item.tab === 'arrived' ? (item.title || item.category) : (item.preTitle || item.category);
+        const title = item.title || item.preTitle || item.category;
         const priceDisplay = item.tab === 'arrived' ? `$${item.price || 0}` : getPreorderPriceBadge(item);
         
         let needSecondHtml = '';
-        if (item.tab === 'preorder' && item.needSecond === '是') {
-          needSecondHtml = `<span class="badge badge-danger">需二補</span>`;
-        }
+        if (item.tab === 'preorder' && item.needSecond === '是') needSecondHtml = `<span class="badge badge-danger">需二補</span>`;
+        let forsaleBadge = item.isForsale ? `<span class="badge badge-success">待售中</span>` : '';
 
         div.innerHTML = `
           <img src="${coverImg}" class="card-img" alt="週邊圖" loading="lazy">
@@ -655,6 +823,7 @@
           <div class="badge-container">
             <span class="badge">${priceDisplay}</span>
             ${needSecondHtml}
+            ${forsaleBadge}
           </div>
         `;
         container.appendChild(div);
@@ -663,77 +832,146 @@
 
     function getPreorderPriceBadge(item) {
       if (item.payType === '全付') return `全付 $${item.fullTotal || 0}`;
-      if (item.payType === '付一半') return `總額 $${item.halfTotal || 0}`;
+      if (item.payType === '付一半（訂金）') return `總額 $${item.halfTotal || 0}`;
       if (item.payType === '未付') return `待付 $${item.unpaidTotal || 0}`;
       return `約 $${item.otherTotal || 0}`;
     }
 
-    function openFolderModal() {
+    // --- Modal Management ---
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // --- Folder CRUD & Tree Selection ---
+    function openFolderModal(folderId = null) {
+      editingFolderId = folderId;
       document.getElementById('folder-name').value = '';
-      document.getElementById('modal-folder').classList.add('active');
+      imgStore.folderCover = [];
+
+      populateFolderParentSelect();
+
+      if (folderId) {
+        document.getElementById('folder-modal-title').innerText = '編輯資料夾';
+        document.getElementById('btn-delete-folder').style.display = 'block';
+        const tx = db.transaction("folders", "readonly");
+        tx.objectStore("folders").get(folderId).onsuccess = (e) => {
+          const f = e.target.result;
+          if (f) {
+            document.getElementById('folder-name').value = f.name;
+            document.getElementById('folder-parent-select').value = f.parentId || '';
+            if (f.coverPhoto) imgStore.folderCover = [f.coverPhoto];
+            renderUploader('uploader-folder-cover', imgStore.folderCover, 1, 'folderCover');
+          }
+        };
+      } else {
+        document.getElementById('folder-modal-title').innerText = '新增資料夾';
+        document.getElementById('btn-delete-folder').style.display = 'none';
+        renderUploader('uploader-folder-cover', imgStore.folderCover, 1, 'folderCover');
+      }
+      openModal('modal-folder');
     }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
+    function populateFolderParentSelect() {
+      const select = document.getElementById('folder-parent-select');
+      select.innerHTML = '<option value="">(根目錄 / 無上層資料夾)</option>';
+
+      const tx = db.transaction("folders", "readonly");
+      tx.objectStore("folders").getAll().onsuccess = (e) => {
+        const allFolders = e.target.result.filter(f => f.tab === currentTab);
+        // Build Tree Options with Indentation
+        buildTreeOptions(allFolders, null, 0, select, editingFolderId);
+      };
+    }
+
+    function buildTreeOptions(folders, parentId, depth, selectEl, excludeFolderId = null) {
+      folders.filter(f => f.parentId === parentId).forEach(f => {
+        // Prevent nesting inside self or children (防呆)
+        if (f.id === excludeFolderId) return;
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.innerText = '─'.repeat(depth) + ' ' + f.name;
+        selectEl.appendChild(opt);
+        buildTreeOptions(folders, f.id, depth + 1, selectEl, excludeFolderId);
+      });
     }
 
     function saveFolder() {
       const name = document.getElementById('folder-name').value.trim();
       if (!name) return alert('請輸入資料夾名稱');
 
-      const folder = {
-        id: 'f_' + Date.now(),
+      const parentVal = document.getElementById('folder-parent-select').value;
+      const folderData = {
+        id: editingFolderId || 'f_' + Date.now(),
         name: name,
         tab: currentTab,
-        parentId: currentFolderId
+        parentId: parentVal === "" ? null : parentVal,
+        coverPhoto: imgStore.folderCover.length > 0 ? imgStore.folderCover[0] : null
       };
 
       const tx = db.transaction("folders", "readwrite");
-      tx.objectStore("folders").add(folder);
+      tx.objectStore("folders").put(folderData);
       tx.oncomplete = () => {
         closeModal('modal-folder');
         renderGrid();
       };
     }
 
-    function populateFolderSelect(selectedFolderId) {
-      const select = document.getElementById('field-folder-select');
-      select.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
-
-      const tx = db.transaction("folders", "readonly");
-      tx.objectStore("folders").openCursor().onsuccess = (e) => {
-        const cursor = e.target.result;
-        if (cursor) {
-          if (cursor.value.tab === currentTab) {
-            const opt = document.createElement('option');
-            opt.value = cursor.value.id;
-            opt.innerText = cursor.value.name;
-            if (cursor.value.id === selectedFolderId) opt.selected = true;
-            select.appendChild(opt);
-          }
-          cursor.continue();
-        }
+    function deleteCurrentFolder() {
+      if (!editingFolderId || !confirm('確定要刪除這個資料夾嗎？裡面的品項將移至主目錄。')) return;
+      const tx = db.transaction("folders", "readwrite");
+      tx.objectStore("folders").delete(editingFolderId);
+      tx.oncomplete = () => {
+        closeModal('modal-folder');
+        renderGrid();
       };
     }
 
+    // --- Item Tree Select Populate ---
+    function populateItemFolderSelects(targetFolderId, targetForsaleFolderId) {
+      const select = document.getElementById('field-folder-select');
+      const forsaleSelect = document.getElementById('field-forsale-folder-select');
+      select.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
+      forsaleSelect.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
+
+      const tx = db.transaction("folders", "readonly");
+      tx.objectStore("folders").getAll().onsuccess = (e) => {
+        const allFolders = e.target.result;
+        buildTreeOptions(allFolders.filter(f => f.tab === (currentTab === 'forsale' ? 'arrived' : currentTab)), null, 0, select);
+        buildTreeOptions(allFolders.filter(f => f.tab === 'forsale'), null, 0, forsaleSelect);
+
+        if (targetFolderId) select.value = targetFolderId;
+        if (targetForsaleFolderId) forsaleSelect.value = targetForsaleFolderId;
+      };
+    }
+
+    function toggleForsaleFolderGroup() {
+      const isChecked = document.getElementById('field-is-forsale').checked;
+      document.getElementById('group-forsale-folder').style.display = isChecked ? 'block' : 'none';
+    }
+
+    // --- Open Item Modal ---
     function openItemModal(item = null) {
       editingItemId = item ? item.id : null;
       document.getElementById('item-form').reset();
-      imgStore = { photos: [], proofs: [], album: [], prePhotos: [] };
+      imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [] };
 
-      populateFolderSelect(item ? item.folderId : currentFolderId);
+      populateItemFolderSelects(item ? item.folderId : currentFolderId, item ? item.forsaleFolderId : null);
 
-      document.getElementById('section-arrived-fields').style.display = currentTab === 'arrived' ? 'block' : 'none';
-      document.getElementById('section-preorder-fields').style.display = currentTab === 'preorder' ? 'block' : 'none';
+      const activeTabMode = currentTab === 'forsale' ? (item ? item.tab : 'arrived') : currentTab;
+
+      document.getElementById('section-arrived-fields').style.display = activeTabMode === 'arrived' ? 'block' : 'none';
+      document.getElementById('section-preorder-fields').style.display = activeTabMode === 'preorder' ? 'block' : 'none';
 
       document.getElementById('btn-delete-action').style.display = item ? 'block' : 'none';
-      document.getElementById('btn-transfer-action').style.display = (item && currentTab === 'preorder') ? 'block' : 'none';
+      document.getElementById('btn-sell-action').style.display = item ? 'block' : 'none';
+      document.getElementById('btn-transfer-action').style.display = (item && activeTabMode === 'preorder') ? 'block' : 'none';
+      document.getElementById('btn-remove-forsale-action').style.display = (item && item.isForsale) ? 'block' : 'none';
 
       if (item) {
+        document.getElementById('field-is-forsale').checked = !!item.isForsale;
         document.getElementById('field-category').value = item.category || '專輯/EP';
-        document.getElementById('field-item-type').value = item.itemType || '玩偶';
+        document.getElementById('field-item-type').value = item.itemType || '娃';
 
-        if (currentTab === 'arrived') {
+        if (activeTabMode === 'arrived') {
           document.getElementById('field-title').value = item.title || '';
           document.getElementById('field-price').value = item.price || 0;
           document.getElementById('field-received-date').value = item.receivedDate || '';
@@ -771,33 +1009,32 @@
           document.getElementById('pre-other-notes').value = item.preNotes || '';
 
           imgStore.prePhotos = item.prePhotos || [];
+          imgStore.preProofs = item.preProofs || [];
         }
       }
 
+      toggleForsaleFolderGroup();
       toggleAlbumFields();
       togglePaymentFlow();
       renderAllPhotoUploaders();
       
-      document.getElementById('modal-item').classList.add('active');
+      openModal('modal-item');
     }
 
     function toggleAlbumFields() {
       const cat = document.getElementById('field-category').value;
       const isAlbum = cat === '專輯/EP';
-      document.getElementById('group-album-contents').style.display = (isAlbum && currentTab === 'arrived') ? 'block' : 'none';
+      document.getElementById('group-album-contents').style.display = isAlbum ? 'block' : 'none';
     }
 
     function togglePaymentFlow() {
-      if (currentTab !== 'preorder') return;
       const type = document.getElementById('field-pay-type').value;
       document.getElementById('flow-full').style.display = type === '全付' ? 'block' : 'none';
-      document.getElementById('flow-half').style.display = type === '付一半' ? 'block' : 'none';
+      document.getElementById('flow-half').style.display = type === '付一半（訂金）' ? 'block' : 'none';
       document.getElementById('flow-unpaid').style.display = type === '未付' ? 'block' : 'none';
       document.getElementById('flow-other').style.display = type === '其他' ? 'block' : 'none';
 
-      calcFullTotal();
-      calcHalfTotal();
-      calcUnpaidTotal();
+      calcFullTotal(); calcHalfTotal(); calcUnpaidTotal();
     }
 
     function checkOtherField(selectEl, targetInputId) {
@@ -823,10 +1060,8 @@
       const total = parseFloat(document.getElementById('pre-half-total').value) || 0;
       const paid = parseFloat(document.getElementById('pre-half-paid').value) || 0;
       const s = parseFloat(document.getElementById('pre-half-shipfee').value) || 0;
-
       const unpaid = total - paid;
       document.getElementById('pre-half-unpaid').value = unpaid;
-
       document.getElementById('calc-half-res1').innerText = `1. 金額加總: $${total + s}`;
       document.getElementById('calc-half-res2').innerText = `2. 未付金額加總 (未付+運費): $${unpaid + s}`;
       return { totalWithShip: total + s, unpaidWithShip: unpaid + s };
@@ -844,6 +1079,7 @@
       renderUploader('uploader-proofs', imgStore.proofs, 3, 'proofs');
       renderUploader('uploader-album', imgStore.album, 10, 'album');
       renderUploader('uploader-pre-photos', imgStore.prePhotos, 3, 'prePhotos');
+      renderUploader('uploader-pre-proofs', imgStore.preProofs, 3, 'preProofs');
     }
 
     function renderUploader(elementId, array, max, key) {
@@ -852,12 +1088,10 @@
       el.innerHTML = '';
       array.forEach((imgSrc, idx) => {
         const img = document.createElement('img');
-        img.src = imgSrc;
-        img.className = 'photo-preview';
+        img.src = imgSrc; img.className = 'photo-preview';
         img.onclick = () => {
           if (confirm('是否刪除此照片？')) {
-            array.splice(idx, 1);
-            renderUploader(elementId, array, max, key);
+            array.splice(idx, 1); renderUploader(elementId, array, max, key);
           }
         };
         el.appendChild(img);
@@ -865,8 +1099,7 @@
 
       if (array.length < max) {
         const btn = document.createElement('div');
-        btn.className = 'photo-add-btn';
-        btn.innerText = '＋';
+        btn.className = 'photo-add-btn'; btn.innerText = '＋';
         btn.onclick = () => triggerImageSelect(array, max, () => renderUploader(elementId, array, max, key));
         el.appendChild(btn);
       }
@@ -874,12 +1107,10 @@
 
     function triggerImageSelect(targetArray, max, callback) {
       const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
+      input.type = 'file'; input.accept = 'image/*';
       input.onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = (event) => {
           const img = new Image();
@@ -888,14 +1119,9 @@
             const MAX_WIDTH = 600;
             let scale = MAX_WIDTH / img.width;
             if (scale > 1) scale = 1;
-            
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-            targetArray.push(compressedBase64);
+            canvas.width = img.width * scale; canvas.height = img.height * scale;
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            targetArray.push(canvas.toDataURL('image/jpeg', 0.6));
             callback();
           };
           img.src = event.target.result;
@@ -905,19 +1131,27 @@
       input.click();
     }
 
+    // --- Save Item ---
     function saveItem() {
       const selectedFolderValue = document.getElementById('field-folder-select').value;
       const targetFolderId = selectedFolderValue === "" ? null : selectedFolderValue;
 
+      const selectedForsaleFolderValue = document.getElementById('field-forsale-folder-select').value;
+      const targetForsaleFolderId = selectedForsaleFolderValue === "" ? null : selectedForsaleFolderValue;
+
+      const activeTabMode = currentTab === 'forsale' ? 'arrived' : currentTab;
+
       const itemData = {
         id: editingItemId || 'item_' + Date.now(),
-        tab: currentTab,
+        tab: activeTabMode,
         folderId: targetFolderId,
+        isForsale: document.getElementById('field-is-forsale').checked,
+        forsaleFolderId: targetForsaleFolderId,
         category: document.getElementById('field-category').value,
         itemType: document.getElementById('field-item-type').value,
       };
 
-      if (currentTab === 'arrived') {
+      if (activeTabMode === 'arrived') {
         itemData.title = document.getElementById('field-title').value;
         itemData.price = parseFloat(document.getElementById('field-price').value) || 0;
         itemData.receivedDate = document.getElementById('field-received-date').value;
@@ -930,6 +1164,7 @@
       } else {
         itemData.preTitle = document.getElementById('field-pre-title').value;
         itemData.prePhotos = imgStore.prePhotos;
+        itemData.preProofs = imgStore.preProofs;
         itemData.preDate = document.getElementById('field-pre-date').value;
         itemData.preEta = document.getElementById('field-pre-eta').value;
         itemData.payType = document.getElementById('field-pay-type').value;
@@ -937,7 +1172,7 @@
         if (itemData.payType === '全付') {
           itemData.needSecond = document.getElementById('pre-full-need-second').value;
           itemData.preNotes = document.getElementById('pre-full-notes').value;
-        } else if (itemData.payType === '付一半') {
+        } else if (itemData.payType === '付一半（訂金）') {
           itemData.needSecond = document.getElementById('pre-half-need-second').value;
           itemData.preNotes = document.getElementById('pre-half-notes').value;
         } else if (itemData.payType === '未付') {
@@ -975,75 +1210,132 @@
       };
     }
 
-    function transferPreorderToArrived() {
+    // --- Transfer Dialog & Logic ---
+    function openTransferModal() {
+      const select = document.getElementById('transfer-target-folder');
+      select.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
+
+      const tx = db.transaction("folders", "readonly");
+      tx.objectStore("folders").getAll().onsuccess = (e) => {
+        buildTreeOptions(e.target.result.filter(f => f.tab === 'arrived'), null, 0, select);
+        openModal('modal-transfer-dialog');
+      };
+    }
+
+    function executeTransferToArrived() {
       if (!editingItemId) return;
+      const secondFee = parseFloat(document.getElementById('transfer-second-fee').value) || 0;
+      const targetFolderValue = document.getElementById('transfer-target-folder').value;
+      const targetFolderId = targetFolderValue === "" ? null : targetFolderValue;
 
       const tx = db.transaction("items", "readonly");
       tx.objectStore("items").get(editingItemId).onsuccess = (e) => {
         const preItem = e.target.result;
         if (!preItem) return;
 
-        let finalPrice = 0;
+        let basePrice = preItem.fullTotal || preItem.halfTotal || preItem.unpaidTotal || parseFloat(preItem.otherTotal) || 0;
+        let finalPrice = basePrice + secondFee;
+
         let infoText = `【原預購明細】\n`;
         infoText += `下單日期: ${preItem.preDate || '未填'}\n`;
         infoText += `預計抵達: ${preItem.preEta || '未填'}\n`;
         infoText += `付款狀態: ${preItem.payType}\n`;
-
-        if (preItem.payType === '全付') {
-          finalPrice = preItem.fullTotal || 0;
-          infoText += `總金額: $${preItem.fullPrice} / 運費: $${preItem.fullShipFee}\n`;
-          infoText += `付款方式: ${document.getElementById('pre-full-paymethod').value}\n`;
-          infoText += `寄送方式: ${document.getElementById('pre-full-shipmethod').value}\n`;
-        } else if (preItem.payType === '付一半') {
-          finalPrice = preItem.halfTotal || 0;
-          infoText += `總金額: $${preItem.halfPrice} / 運費: $${preItem.halfShipFee}\n`;
-          infoText += `已付訂金: $${preItem.halfPaid}\n`;
-          infoText += `付款方式: ${document.getElementById('pre-half-paymethod').value}\n`;
-          infoText += `補款方式: ${document.getElementById('pre-half-remethod').value}\n`;
-          infoText += `寄送方式: ${document.getElementById('pre-half-shipmethod').value}\n`;
-        } else if (preItem.payType === '未付') {
-          finalPrice = preItem.unpaidTotal || 0;
-          infoText += `總金額: $${preItem.unpaidPrice} / 運費: $${preItem.unpaidShipFee}\n`;
-          infoText += `付款方式: ${document.getElementById('pre-unpaid-paymethod').value}\n`;
-          infoText += `寄送方式: ${document.getElementById('pre-unpaid-shipmethod').value}\n`;
-        } else {
-          finalPrice = parseFloat(preItem.otherTotal) || 0;
-          infoText += `總價格: ${preItem.otherTotal}\n`;
-          infoText += `付款方式: ${preItem.otherPay}\n`;
-          infoText += `寄送方式: ${preItem.otherShip}\n`;
-        }
-
-        if (preItem.preNotes) infoText += `備註: ${preItem.preNotes}`;
+        infoText += `二補金額: $${secondFee}\n`;
+        if (preItem.preNotes) infoText += `原備註: ${preItem.preNotes}`;
 
         const arrivedItem = {
           id: preItem.id,
           tab: 'arrived',
-          folderId: preItem.folderId,
+          folderId: targetFolderId,
+          isForsale: preItem.isForsale, // 保持待售狀態
+          forsaleFolderId: preItem.forsaleFolderId,
           category: preItem.category,
           itemType: preItem.itemType,
           title: preItem.preTitle || preItem.category,
-          price: finalPrice,
+          price: finalPrice, // 總額 + 二補
           photos: preItem.prePhotos || [],
+          proofs: preItem.preProofs || [], // 轉移證明照片
           receivedDate: new Date().toISOString().split('T')[0],
-          proofs: [],
-          album: [],
-          albumText: '',
-          notes: preItem.preNotes || '',
-          info: infoText
+          album: [], albumText: '', notes: preItem.preNotes || '', info: infoText
         };
 
         const writeTx = db.transaction("items", "readwrite");
         writeTx.objectStore("items").put(arrivedItem);
         writeTx.oncomplete = () => {
-          alert('已成功轉移至「在家/已到貨」！');
+          alert('成功轉移至「在家/已到貨」！');
+          closeModal('modal-transfer-dialog');
           closeModal('modal-item');
           switchTab('arrived');
         };
       };
     }
 
+    // --- Mark as Sold Modal & Logic ---
+    function openSellModal() {
+      imgStore.sellProofs = [];
+      renderUploader('uploader-sell-proofs', imgStore.sellProofs, 3, 'sellProofs');
+      document.getElementById('sell-date').value = new Date().toISOString().split('T')[0];
+      openModal('modal-sell-dialog');
+    }
+
+    function executeMarkAsSold() {
+      if (!editingItemId) return;
+      const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
+      const platformSelect = document.getElementById('sell-platform').value;
+      const platformStr = platformSelect === '其他' ? document.getElementById('sell-platform-other').value : platformSelect;
+
+      const buyerType = document.getElementById('sell-buyer-type').value;
+      const buyerInfo = document.getElementById('sell-buyer-info').value;
+      const sellDate = document.getElementById('sell-date').value;
+
+      const tx = db.transaction("items", "readonly");
+      tx.objectStore("items").get(editingItemId).onsuccess = (e) => {
+        const item = e.target.result;
+        if (!item) return;
+
+        const originalCost = item.price || item.fullTotal || item.halfTotal || item.unpaidTotal || parseFloat(item.otherTotal) || 0;
+        const profit = sellPrice - originalCost;
+
+        item.isSold = true;
+        item.soldData = {
+          sellPrice: sellPrice,
+          platform: platformStr,
+          buyerType: buyerType,
+          buyerInfo: buyerInfo,
+          sellProofs: imgStore.sellProofs,
+          sellDate: sellDate,
+          profit: profit
+        };
+
+        const writeTx = db.transaction("items", "readwrite");
+        writeTx.objectStore("items").put(item);
+        writeTx.oncomplete = () => {
+          alert(`已成功移至「已售出歸檔庫」！(損益: $${profit})`);
+          closeModal('modal-sell-dialog');
+          closeModal('modal-item');
+          renderGrid();
+        };
+      };
+    }
+
+    function removeForsaleStatus() {
+      if (!editingItemId) return;
+      const tx = db.transaction("items", "readwrite");
+      tx.objectStore("items").get(editingItemId).onsuccess = (e) => {
+        const item = e.target.result;
+        if (item) {
+          item.isForsale = false;
+          tx.objectStore("items").put(item);
+        }
+      };
+      tx.oncomplete = () => {
+        closeModal('modal-item');
+        renderGrid();
+      };
+    }
+
     function deleteCurrentItem() {
-      if (!editingItemId || !confirm('確定要刪除這個品項嗎？')) return;
+      if (!editingItemId || !confirm('確定要徹底刪除這個品項嗎？刪除後無法復原！')) return;
       const tx = db.transaction("items", "readwrite");
       tx.objectStore("items").delete(editingItemId);
       tx.oncomplete = () => {
@@ -1052,6 +1344,128 @@
       };
     }
 
+    // --- Sold Archive Grid & Restore ---
+    function openSoldArchiveModal() {
+      renderSoldArchiveList();
+      openModal('modal-sold-archive');
+    }
+
+    function renderSoldArchiveList() {
+      const container = document.getElementById('sold-archive-list');
+      container.innerHTML = '';
+      const keyword = document.getElementById('sold-search-input').value.trim().toLowerCase();
+
+      const tx = db.transaction("items", "readonly");
+      tx.objectStore("items").openCursor().onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          const item = cursor.value;
+          if (item.isSold) {
+            const title = item.title || item.preTitle || item.category;
+            const buyerStr = item.soldData ? `${item.soldData.buyerType}: ${item.soldData.buyerInfo}` : '';
+            
+            if (!keyword || (title + buyerStr + (item.soldData?.platform||'')).toLowerCase().includes(keyword)) {
+              const div = document.createElement('div');
+              div.className = 'card';
+              let coverImg = (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '';
+
+              div.innerHTML = `
+                <img src="${coverImg}" class="card-img" alt="圖">
+                <div class="card-title">${title}</div>
+                <div class="card-sub">售價: $${item.soldData?.sellPrice || 0} (${item.soldData?.platform || ''})</div>
+                <div class="badge-container">
+                  <span class="badge ${item.soldData?.profit >= 0 ? 'badge-success' : 'badge-danger'}">損益: $${item.soldData?.profit || 0}</span>
+                </div>
+                <button onclick="restoreSoldItem('${item.id}')" style="margin-top:8px; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.75rem;">復原(取消售出)</button>
+              `;
+              container.appendChild(div);
+            }
+          }
+          cursor.continue();
+        }
+      };
+    }
+
+    function restoreSoldItem(itemId) {
+      if (!confirm('是否將此品項取消售出並復原回原本的資料夾？')) return;
+      const tx = db.transaction("items", "readwrite");
+      tx.objectStore("items").get(itemId).onsuccess = (e) => {
+        const item = e.target.result;
+        if (item) {
+          item.isSold = false;
+          tx.objectStore("items").put(item);
+        }
+      };
+      tx.oncomplete = () => {
+        renderSoldArchiveList();
+        renderGrid();
+      };
+    }
+
+    // --- Export CSV / Excel ---
+    function openExportModal() { openModal('modal-export'); }
+
+    function executeExportCsv() {
+      const range = document.getElementById('export-range').value;
+      const categoryFilter = document.getElementById('export-category').value;
+      const includeSold = document.getElementById('export-include-sold').checked;
+
+      const tx = db.transaction("items", "readonly");
+      tx.objectStore("items").getAll().onsuccess = (e) => {
+        let items = e.target.result;
+
+        // Filter Sold
+        if (!includeSold) items = items.filter(i => !i.isSold);
+
+        // Filter Range
+        if (range === 'arrived') items = items.filter(i => i.tab === 'arrived');
+        if (range === 'preorder') items = items.filter(i => i.tab === 'preorder');
+        if (range === 'forsale') items = items.filter(i => i.isForsale);
+
+        // Filter Category
+        if (categoryFilter !== 'all') items = items.filter(i => i.category === categoryFilter);
+
+        // Construct 10-Column CSV
+        let csvContent = "\uFEFF"; // UTF-8 BOM for Excel Chinese support
+        csvContent += "狀態,分類,品項,名稱,日期,商品金額,運費,二補金額,總支出,待付金額\n";
+
+        items.forEach(i => {
+          const status = i.isSold ? '已售出' : (i.tab === 'arrived' ? '在家' : '預購');
+          const category = i.category || '';
+          const itemType = i.itemType || '';
+          const name = (i.title || i.preTitle || '').replace(/,/g, ' ');
+          const date = i.receivedDate || i.preDate || '';
+
+          let itemCost = 0; let shipFee = 0; let secondFee = 0; let unpaidAmount = 0;
+
+          if (i.tab === 'arrived') {
+            itemCost = i.price || 0; unpaidAmount = 0;
+          } else {
+            if (i.payType === '全付') {
+              itemCost = i.fullPrice || 0; shipFee = i.fullShipFee || 0; unpaidAmount = 0;
+            } else if (i.payType === '付一半（訂金）') {
+              itemCost = i.halfPrice || 0; shipFee = i.halfShipFee || 0; unpaidAmount = (itemCost - (i.halfPaid || 0)) + shipFee;
+            } else if (i.payType === '未付') {
+              itemCost = i.unpaidPrice || 0; shipFee = i.unpaidShipFee || 0; unpaidAmount = itemCost + shipFee;
+            } else {
+              itemCost = parseFloat(i.otherTotal) || 0; unpaidAmount = 0;
+            }
+          }
+
+          const totalCost = itemCost + shipFee + secondFee;
+          csvContent += `"${status}","${category}","${itemType}","${name}","${date}",${itemCost},${shipFee},${secondFee},${totalCost},${unpaidAmount}\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `週邊們_收支表_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        closeModal('modal-export');
+      };
+    }
+
+    // --- Backup & Restore (JSON) ---
     function backupData() {
       const tx = db.transaction(["folders", "items"], "readonly");
       let exportData = { folders: [], items: [] };
@@ -1063,7 +1477,7 @@
           const blob = new Blob([JSON.stringify(exportData)], { type: "application/json" });
           const a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
-          a.download = `週邊們備份_${new Date().toISOString().split('T')[0]}.json`;
+          a.download = `週邊們完整備份_${new Date().toISOString().split('T')[0]}.json`;
           a.click();
         };
       };
@@ -1071,8 +1485,7 @@
 
     function restoreData() {
       const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'application/json';
+      input.type = 'file'; input.accept = 'application/json';
       input.onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -1085,13 +1498,10 @@
               data.folders.forEach(f => tx.objectStore("folders").put(f));
               data.items.forEach(i => tx.objectStore("items").put(i));
               tx.oncomplete = () => {
-                alert('還原成功！');
-                renderGrid();
+                alert('還原成功！'); renderGrid();
               };
             }
-          } catch (err) {
-            alert('檔案格式不正確！');
-          }
+          } catch (err) { alert('檔案格式不正確！'); }
         };
         reader.readAsDataURL(file);
       };
