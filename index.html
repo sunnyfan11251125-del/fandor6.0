@@ -132,6 +132,7 @@
 
     .btn-submit { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
     .btn-transfer { width: 100%; padding: 12px; background: var(--success-color); color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
+    .btn-split { width: 100%; padding: 12px; background: #8e44ad; color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
     .btn-sell { width: 100%; padding: 12px; background: #f39c12; color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
     .btn-delete { width: 100%; padding: 10px; background: transparent; color: var(--danger-color); border: none; font-size: 0.85rem; margin-top: 5px; cursor: pointer; }
 
@@ -262,6 +263,12 @@
       </div>
       
       <form id="item-form" onsubmit="event.preventDefault();">
+        <!-- 數量欄位 -->
+        <div class="form-group">
+          <label>數量</label>
+          <input type="number" id="field-quantity" class="form-control" value="1" min="1">
+        </div>
+
         <!-- 待售標籤勾選 -->
         <div class="form-group" style="background:var(--primary-light); padding:10px; border-radius:8px;">
           <label class="checkbox-inline">
@@ -320,7 +327,7 @@
             <input type="text" id="field-title" class="form-control" placeholder="例如：EXIST 藍色版">
           </div>
           <div class="form-group">
-            <label>3. 價格</label>
+            <label>3. 價格 (總價)</label>
             <input type="number" id="field-price" class="form-control" placeholder="0">
           </div>
           <div class="form-group">
@@ -541,11 +548,34 @@
 
         <!-- 按鈕群組 -->
         <button type="button" class="btn-submit" onclick="saveItem()">儲存此品項</button>
+        <button type="button" id="btn-split-action" class="btn-split" style="display:none;" onclick="openSplitModal()">✂️ 拆分部分數量轉待售</button>
         <button type="button" id="btn-transfer-action" class="btn-transfer" style="display:none;" onclick="openTransferModal()">已到貨，轉移至「在家/已到貨」</button>
         <button type="button" id="btn-sell-action" class="btn-sell" style="display:none;" onclick="openSellModal()">💰 標記為「已售出」</button>
         <button type="button" id="btn-remove-forsale-action" class="btn-delete" style="display:none; color:#f39c12;" onclick="removeForsaleStatus()">僅取消待售狀態</button>
         <button type="button" id="btn-delete-action" class="btn-delete" style="display:none;" onclick="deleteCurrentItem()">徹底刪除此品項</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Split Modal (拆分數量彈窗) -->
+  <div class="modal" id="modal-split-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">✂️ 拆分品項轉為待售</div>
+        <button class="close-btn" onclick="closeModal('modal-split-dialog')">✕</button>
+      </div>
+      <div class="form-group">
+        <label id="split-current-qty-label">當前總數量：1 個</label>
+      </div>
+      <div class="form-group">
+        <label>要拆出轉為「待售」的數量</label>
+        <input type="number" id="split-qty-input" class="form-control" value="1" min="1" oninput="calcSplitPriceAuto()">
+      </div>
+      <div class="form-group">
+        <label>拆出待售部分的「分攤成本金額」</label>
+        <input type="number" id="split-price-input" class="form-control" placeholder="0">
+      </div>
+      <button class="btn-split" onclick="executeSplitItem()">確認拆分並新增待售卡片</button>
     </div>
   </div>
 
@@ -704,6 +734,7 @@
     let folderPath = [];
     let editingItemId = null;
     let editingFolderId = null;
+    let currentEditingItemObject = null; // 快取當前編輯的品項完整物件
 
     let imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [], sellProofs: [], folderCover: [] };
 
@@ -761,7 +792,7 @@
       renderGrid();
     }
 
-    // --- Render Items & Folders (getAll 一次性讀取，徹底告別游標重複渲染) ---
+    // --- Render Items & Folders ---
     function renderGrid() {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
@@ -781,12 +812,11 @@
           const allItems = e2.target.result || [];
 
           let folders = [];
-          let itemMap = new Map(); // 使用 Map 精準去重
+          let itemMap = new Map();
 
           const isGlobalSearch = searchKeyword || dateStart || dateEnd;
 
-          // 1. 過濾資料夾
-          if (!dateStart && !dateEnd) { // 日期篩選時專注於商品
+          if (!dateStart && !dateEnd) {
             allFolders.forEach(f => {
               if (f.tab === currentTab) {
                 if (searchKeyword) {
@@ -798,11 +828,9 @@
             });
           }
 
-          // 2. 過濾商品品項
           allItems.forEach(val => {
             if (!val.isSold) {
               if (isGlobalSearch) {
-                // 搜尋模式
                 const matchTab = (currentTab === 'forsale') ? val.isForsale : (val.tab === currentTab);
                 if (matchTab) {
                   let matchKey = true;
@@ -827,7 +855,6 @@
                   if (matchKey && matchDate) itemMap.set(val.id, val);
                 }
               } else {
-                // 正常層級瀏覽模式
                 if (currentTab === 'forsale') {
                   if (val.isForsale && val.forsaleFolderId === currentFolderId) itemMap.set(val.id, val);
                 } else if (val.tab === currentTab && val.folderId === currentFolderId) {
@@ -858,7 +885,7 @@
 
     function displayGridElements(folders, items) {
       const container = document.getElementById('grid-container');
-      container.innerHTML = ''; // 再次防呆，確保每次渲染前均為空
+      container.innerHTML = '';
 
       folders.forEach(f => {
         const div = document.createElement('div');
@@ -895,6 +922,7 @@
           : `<div class="card-no-img">無圖片</div>`;
 
         const title = item.title || item.preTitle || item.category;
+        const qtyStr = (item.quantity && item.quantity > 1) ? ` [x${item.quantity}]` : '';
         const priceDisplay = item.tab === 'arrived' ? `$${item.price || 0}` : getPreorderPriceBadge(item);
         
         let needSecondHtml = '';
@@ -903,7 +931,7 @@
 
         div.innerHTML = `
           ${coverHtml}
-          <div class="card-title">${title}</div>
+          <div class="card-title">${title}${qtyStr}</div>
           <div class="card-sub">${item.itemType}</div>
           <div class="badge-container">
             <span class="badge">${priceDisplay}</span>
@@ -1034,6 +1062,7 @@
     // --- Open Item Modal ---
     function openItemModal(item = null) {
       editingItemId = item ? item.id : null;
+      currentEditingItemObject = item;
       document.getElementById('item-form').reset();
       imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [] };
 
@@ -1046,10 +1075,12 @@
 
       document.getElementById('btn-delete-action').style.display = item ? 'block' : 'none';
       document.getElementById('btn-sell-action').style.display = item ? 'block' : 'none';
+      document.getElementById('btn-split-action').style.display = (item && item.quantity > 1) ? 'block' : 'none';
       document.getElementById('btn-transfer-action').style.display = (item && activeTabMode === 'preorder') ? 'block' : 'none';
       document.getElementById('btn-remove-forsale-action').style.display = (item && item.isForsale) ? 'block' : 'none';
 
       if (item) {
+        document.getElementById('field-quantity').value = item.quantity || 1;
         document.getElementById('field-is-forsale').checked = !!item.isForsale;
         document.getElementById('field-category').value = item.category || '專輯/EP';
         document.getElementById('field-item-type').value = item.itemType || '娃';
@@ -1226,6 +1257,7 @@
 
       const itemData = {
         id: editingItemId || 'item_' + Date.now(),
+        quantity: parseInt(document.getElementById('field-quantity').value) || 1,
         tab: activeTabMode,
         folderId: targetFolderId,
         isForsale: document.getElementById('field-is-forsale').checked,
@@ -1293,6 +1325,78 @@
       };
     }
 
+    // --- Split Item Logic (拆分部分數量轉待售) ---
+    function openSplitModal() {
+      if (!currentEditingItemObject) return;
+      const totalQty = currentEditingItemObject.quantity || 1;
+      document.getElementById('split-current-qty-label').innerText = `當前總數量：${totalQty} 個`;
+      
+      const splitInput = document.getElementById('split-qty-input');
+      splitInput.max = totalQty - 1;
+      splitInput.value = 1;
+
+      calcSplitPriceAuto();
+      openModal('modal-split-dialog');
+    }
+
+    function calcSplitPriceAuto() {
+      if (!currentEditingItemObject) return;
+      const totalQty = currentEditingItemObject.quantity || 1;
+      const splitQty = parseInt(document.getElementById('split-qty-input').value) || 1;
+      
+      const totalPrice = currentEditingItemObject.price || currentEditingItemObject.fullTotal || 0;
+      if (totalPrice > 0 && totalQty > 0) {
+        const suggestedPrice = Math.round((totalPrice / totalQty) * splitQty);
+        document.getElementById('split-price-input').value = suggestedPrice;
+      }
+    }
+
+    function executeSplitItem() {
+      if (!currentEditingItemObject) return;
+      const origItem = currentEditingItemObject;
+      const totalQty = origItem.quantity || 1;
+      const splitQty = parseInt(document.getElementById('split-qty-input').value) || 1;
+      const splitPrice = parseFloat(document.getElementById('split-price-input').value) || 0;
+
+      if (splitQty >= totalQty || splitQty < 1) {
+        return alert(`拆分數量必須介於 1 到 ${totalQty - 1} 之間！`);
+      }
+
+      const origPrice = origItem.price || origItem.fullTotal || 0;
+      const remainingQty = totalQty - splitQty;
+      const remainingPrice = origPrice - splitPrice;
+      const titleName = origItem.title || origItem.preTitle || origItem.category;
+
+      // 1. 更新原卡片 (扣減數量與價格，寫入雙向履歷)
+      origItem.quantity = remainingQty;
+      if (origItem.tab === 'arrived') origItem.price = Math.max(0, remainingPrice);
+      const origHistoryNote = `\n📝 拆分履歷：已拆出 ${splitQty} 件轉待售（此剩餘 ${remainingQty} 件成本分攤 $${Math.max(0, remainingPrice)}）`;
+      if (origItem.tab === 'arrived') origItem.notes = (origItem.notes || '') + origHistoryNote;
+      else origItem.preNotes = (origItem.preNotes || '') + origHistoryNote;
+
+      // 2. 建立新待售卡片 (自動帶入原始大組合履歷)
+      const newItem = JSON.parse(JSON.stringify(origItem));
+      newItem.id = 'item_' + Date.now();
+      newItem.quantity = splitQty;
+      newItem.isForsale = true; // 強制勾選待售
+      if (newItem.tab === 'arrived') newItem.price = splitPrice;
+      
+      const newHistoryNote = `\n📝 拆分履歷：拆分自原始組合「${titleName}」（全套 ${totalQty} 件 / 總花費 $${origPrice}）`;
+      if (newItem.tab === 'arrived') newItem.notes = (newItem.notes || '') + newHistoryNote;
+      else newItem.preNotes = (newItem.preNotes || '') + newHistoryNote;
+
+      const tx = db.transaction("items", "readwrite");
+      tx.objectStore("items").put(origItem);
+      tx.objectStore("items").put(newItem);
+
+      tx.oncomplete = () => {
+        alert(`成功拆分！\n• 自留組：剩 ${remainingQty} 個 ($${Math.max(0, remainingPrice)})\n• 待售組：拆出 ${splitQty} 個 ($${splitPrice})`);
+        closeModal('modal-split-dialog');
+        closeModal('modal-item');
+        renderGrid();
+      };
+    }
+
     // --- Transfer Dialog & Logic ---
     function openTransferModal() {
       const select = document.getElementById('transfer-target-folder');
@@ -1328,6 +1432,7 @@
 
         const arrivedItem = {
           id: preItem.id,
+          quantity: preItem.quantity || 1,
           tab: 'arrived',
           folderId: targetFolderId,
           isForsale: preItem.isForsale,
@@ -1453,7 +1558,7 @@
 
               div.innerHTML = `
                 <img src="${coverImg}" class="card-img" alt="圖">
-                <div class="card-title">${title}</div>
+                <div class="card-title">${title} [x${item.quantity || 1}]</div>
                 <div class="card-sub">售價: $${item.soldData?.sellPrice || 0} (${item.soldData?.platform || ''})</div>
                 <div class="badge-container">
                   <span class="badge ${item.soldData?.profit >= 0 ? 'badge-success' : 'badge-danger'}">損益: $${item.soldData?.profit || 0}</span>
@@ -1483,7 +1588,7 @@
       };
     }
 
-    // --- Export Excel (複選分類連動 + SheetJS 原生 .xlsx 匯出) ---
+    // --- Export Excel (包含數量資訊) ---
     function openExportModal() { openModal('modal-export'); }
 
     function toggleExportCatAll(allCb) {
@@ -1539,6 +1644,7 @@
           const category = i.category || '';
           const itemType = i.itemType || '';
           const name = i.title || i.preTitle || '';
+          const qty = i.quantity || 1;
           const date = i.receivedDate || i.preDate || '';
 
           let itemCost = 0; let shipFee = 0; let secondFee = 0; let unpaidAmount = 0;
@@ -1564,6 +1670,7 @@
             "分類": category,
             "品項": itemType,
             "名稱": name,
+            "數量": qty,
             "日期": date,
             "商品金額": itemCost,
             "運費": shipFee,
@@ -1583,7 +1690,7 @@
         XLSX.utils.book_append_sheet(workbook, worksheet, "週邊明細");
 
         const max_width = excelData.reduce((w, r) => Math.max(w, r.名稱 ? r.名稱.length : 10), 10);
-        worksheet['!cols'] = [ { wch: 8 }, { wch: 15 }, { wch: 10 }, { wch: Math.min(max_width + 5, 30) }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
+        worksheet['!cols'] = [ { wch: 8 }, { wch: 15 }, { wch: 10 }, { wch: Math.min(max_width + 5, 30) }, { wch: 6 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
 
         const todayStr = new Date().toISOString().split('T')[0];
         XLSX.writeFile(workbook, `週邊們_收支表_${todayStr}.xlsx`);
@@ -1638,6 +1745,7 @@
                 data.items.forEach(i => {
                   if (i.isForsale === undefined) i.isForsale = false;
                   if (i.isSold === undefined) i.isSold = false;
+                  if (i.quantity === undefined) i.quantity = 1;
                   if (!i.tab) i.tab = 'arrived';
                   if (!i.folderId) i.folderId = null;
                   itemStore.put(i);
