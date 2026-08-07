@@ -742,7 +742,7 @@
       renderGrid();
     }
 
-    // --- Render Items & Folders (徹底修正搜尋去重與資料夾顯示 BUG) ---
+    // --- Render Items & Folders (資料夾僅限比對資料夾名稱、商品去重) ---
     function renderGrid() {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
@@ -755,28 +755,39 @@
       const itemStore = tx.objectStore("items");
 
       let folders = [];
-      let itemMap = new Map(); // 使用 Map 防止任何品項重複加入
+      let itemMap = new Map(); // 用 Map 確保任何情況下，同一個商品都不會出現第二次
 
+      // 1. 處理資料夾
       folderStore.openCursor().onsuccess = (e) => {
         const cursor = e.target.result;
         if (cursor) {
-          // 只有在「沒有搜尋關鍵字」時，才顯示當前層級的資料夾
-          if (!searchKeyword) {
-            if (cursor.value.tab === currentTab && cursor.value.parentId === currentFolderId) {
-              folders.push(cursor.value);
+          const f = cursor.value;
+          if (f.tab === currentTab) {
+            if (searchKeyword) {
+              // 有搜尋時：只比對「資料夾名稱」
+              if (f.name.toLowerCase().includes(searchKeyword)) {
+                folders.push(f);
+              }
+            } else {
+              // 無搜尋時：正常按父目錄顯示
+              if (f.parentId === currentFolderId) {
+                folders.push(f);
+              }
             }
           }
           cursor.continue();
         } else {
+          // 2. 處理商品品項
           itemStore.openCursor().onsuccess = (e2) => {
             const cursor2 = e2.target.result;
             if (cursor2) {
               const val = cursor2.value;
               if (!val.isSold) {
-                if (searchKeyword) {
-                  // 有關鍵字：跨資料夾進行全域搜尋
-                  const matchTab = (currentTab === 'forsale') ? val.isForsale : (val.tab === currentTab);
-                  if (matchTab) {
+                const matchTab = (currentTab === 'forsale') ? val.isForsale : (val.tab === currentTab);
+                
+                if (matchTab) {
+                  if (searchKeyword) {
+                    // 有搜尋時：全域搜尋商品欄位
                     const searchSource = [
                       val.title || '',
                       val.preTitle || '',
@@ -790,15 +801,15 @@
                     if (searchSource.includes(searchKeyword)) {
                       itemMap.set(val.id, val);
                     }
-                  }
-                } else {
-                  // 無關鍵字：正常依據目前資料夾層級過濾
-                  if (currentTab === 'forsale') {
-                    if (val.isForsale && val.forsaleFolderId === currentFolderId) {
+                  } else {
+                    // 無搜尋時：只顯示當前資料夾內的商品
+                    if (currentTab === 'forsale') {
+                      if (val.forsaleFolderId === currentFolderId) {
+                        itemMap.set(val.id, val);
+                      }
+                    } else if (val.folderId === currentFolderId) {
                       itemMap.set(val.id, val);
                     }
-                  } else if (val.tab === currentTab && val.folderId === currentFolderId) {
-                    itemMap.set(val.id, val);
                   }
                 }
               }
