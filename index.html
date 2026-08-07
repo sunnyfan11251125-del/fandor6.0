@@ -71,6 +71,11 @@
     }
     .card-folder { border-left: 4px solid var(--primary-color); cursor: pointer; }
     .card-img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: var(--primary-light); }
+    .card-no-img {
+      width: 100%; height: 110px; border-radius: 8px; margin-bottom: 8px;
+      background: var(--primary-light); color: var(--primary-dark);
+      display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 600;
+    }
     .card-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .card-sub { font-size: 0.75rem; color: var(--text-sub); }
     
@@ -129,7 +134,6 @@
     .other-input-block { margin-top: 6px; display: none; }
     .checkbox-inline { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); }
 
-    /* 匯出選單多選框專用樣式 */
     .checkbox-group-box {
       background: var(--primary-light);
       padding: 10px;
@@ -738,7 +742,7 @@
       renderGrid();
     }
 
-    // --- Render Items & Folders (搜尋時自動隱藏資料夾，乾淨列出商品) ---
+    // --- Render Items & Folders (徹底修正搜尋去重與資料夾顯示 BUG) ---
     function renderGrid() {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
@@ -751,7 +755,7 @@
       const itemStore = tx.objectStore("items");
 
       let folders = [];
-      let items = [];
+      let itemMap = new Map(); // 使用 Map 防止任何品項重複加入
 
       folderStore.openCursor().onsuccess = (e) => {
         const cursor = e.target.result;
@@ -769,30 +773,38 @@
             if (cursor2) {
               const val = cursor2.value;
               if (!val.isSold) {
-                // 如果有搜尋關鍵字，無視資料夾層級，全域搜尋該分頁所有符合的品項
                 if (searchKeyword) {
+                  // 有關鍵字：跨資料夾進行全域搜尋
                   const matchTab = (currentTab === 'forsale') ? val.isForsale : (val.tab === currentTab);
                   if (matchTab) {
-                    items.push(val);
+                    const searchSource = [
+                      val.title || '',
+                      val.preTitle || '',
+                      val.category || '',
+                      val.itemType || '',
+                      val.notes || '',
+                      val.info || '',
+                      val.albumText || ''
+                    ].join(' ').toLowerCase();
+
+                    if (searchSource.includes(searchKeyword)) {
+                      itemMap.set(val.id, val);
+                    }
                   }
                 } else {
-                  // 無搜尋時，照原本資料夾層級顯示
+                  // 無關鍵字：正常依據目前資料夾層級過濾
                   if (currentTab === 'forsale') {
-                    if (val.isForsale && val.forsaleFolderId === currentFolderId) items.push(val);
+                    if (val.isForsale && val.forsaleFolderId === currentFolderId) {
+                      itemMap.set(val.id, val);
+                    }
                   } else if (val.tab === currentTab && val.folderId === currentFolderId) {
-                    items.push(val);
+                    itemMap.set(val.id, val);
                   }
                 }
               }
               cursor2.continue();
             } else {
-              // 關鍵字過濾商品
-              if (searchKeyword) {
-                items = items.filter(i => {
-                  const t = (i.title || i.preTitle || '') + (i.category || '') + (i.itemType || '') + (i.notes || '') + (i.info || '') + (i.albumText || '');
-                  return t.toLowerCase().includes(searchKeyword);
-                });
-              }
+              let items = Array.from(itemMap.values());
               sortItemList(items, sortType);
               displayGridElements(folders, items);
             }
@@ -842,9 +854,13 @@
         div.className = 'card';
         div.onclick = () => openItemModal(item);
         
-        let coverImg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="%2394B4CB"><rect width="100" height="100" fill="%23eef4f8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="%2394B4CB">無圖片</text></svg>';
-        if (item.photos && item.photos.length > 0) coverImg = item.photos[0];
-        if (item.prePhotos && item.prePhotos.length > 0) coverImg = item.prePhotos[0];
+        let imgUrl = null;
+        if (item.photos && item.photos.length > 0) imgUrl = item.photos[0];
+        if (!imgUrl && item.prePhotos && item.prePhotos.length > 0) imgUrl = item.prePhotos[0];
+
+        let coverHtml = imgUrl 
+          ? `<img src="${imgUrl}" class="card-img" alt="週邊圖" loading="lazy">` 
+          : `<div class="card-no-img">無圖片</div>`;
 
         const title = item.title || item.preTitle || item.category;
         const priceDisplay = item.tab === 'arrived' ? `$${item.price || 0}` : getPreorderPriceBadge(item);
@@ -854,7 +870,7 @@
         let forsaleBadge = item.isForsale ? `<span class="badge badge-success">待售中</span>` : '';
 
         div.innerHTML = `
-          <img src="${coverImg}" class="card-img" alt="週邊圖" loading="lazy">
+          ${coverHtml}
           <div class="card-title">${title}</div>
           <div class="card-sub">${item.itemType}</div>
           <div class="badge-container">
@@ -914,14 +930,12 @@
       const tx = db.transaction("folders", "readonly");
       tx.objectStore("folders").getAll().onsuccess = (e) => {
         const allFolders = e.target.result.filter(f => f.tab === currentTab);
-        // Build Tree Options with Indentation
         buildTreeOptions(allFolders, null, 0, select, editingFolderId);
       };
     }
 
     function buildTreeOptions(folders, parentId, depth, selectEl, excludeFolderId = null) {
       folders.filter(f => f.parentId === parentId).forEach(f => {
-        // Prevent nesting inside self or children (防呆)
         if (f.id === excludeFolderId) return;
         const opt = document.createElement('option');
         opt.value = f.id;
@@ -1284,14 +1298,14 @@
           id: preItem.id,
           tab: 'arrived',
           folderId: targetFolderId,
-          isForsale: preItem.isForsale, // 保持待售狀態
+          isForsale: preItem.isForsale,
           forsaleFolderId: preItem.forsaleFolderId,
           category: preItem.category,
           itemType: preItem.itemType,
           title: preItem.preTitle || preItem.category,
-          price: finalPrice, // 總額 + 二補
+          price: finalPrice,
           photos: preItem.prePhotos || [],
-          proofs: preItem.preProofs || [], // 轉移證明照片
+          proofs: preItem.preProofs || [],
           receivedDate: new Date().toISOString().split('T')[0],
           album: [], albumText: '', notes: preItem.preNotes || '', info: infoText
         };
@@ -1469,7 +1483,6 @@
       const includeSold = document.getElementById('export-include-sold').checked;
       const isAllCat = document.getElementById('export-cat-all').checked;
 
-      // 取得勾選的特定分類
       let selectedCategories = [];
       if (!isAllCat) {
         document.querySelectorAll('.export-cat-option:checked').forEach(cb => {
@@ -1481,20 +1494,16 @@
       tx.objectStore("items").getAll().onsuccess = (e) => {
         let items = e.target.result;
 
-        // 1. 過濾售出狀態
         if (!includeSold) items = items.filter(i => !i.isSold);
 
-        // 2. 過濾範圍
         if (range === 'arrived') items = items.filter(i => i.tab === 'arrived');
         if (range === 'preorder') items = items.filter(i => i.tab === 'preorder');
         if (range === 'forsale') items = items.filter(i => i.isForsale);
 
-        // 3. 過濾複選分類
         if (!isAllCat && selectedCategories.length > 0) {
           items = items.filter(i => selectedCategories.includes(i.category));
         }
 
-        // 構建 SheetJS 資料陣列 (JSON 二維資料)
         const excelData = items.map(i => {
           const status = i.isSold ? '已售出' : (i.tab === 'arrived' ? '在家' : '預購');
           const category = i.category || '';
@@ -1539,12 +1548,10 @@
           return;
         }
 
-        // 使用 SheetJS 建立工作表並導出原生 .xlsx 檔案
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "週邊明細");
 
-        // 自動調整欄寬
         const max_width = excelData.reduce((w, r) => Math.max(w, r.名稱 ? r.名稱.length : 10), 10);
         worksheet['!cols'] = [ { wch: 8 }, { wch: 15 }, { wch: 10 }, { wch: Math.min(max_width + 5, 30) }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
 
@@ -1584,14 +1591,11 @@
         reader.onload = (event) => {
           try {
             const data = JSON.parse(event.target.result);
-            
-            // 判斷是否為合法的備份結構
             if (data && (Array.isArray(data.items) || Array.isArray(data.folders))) {
               const tx = db.transaction(["folders", "items"], "readwrite");
               const folderStore = tx.objectStore("folders");
               const itemStore = tx.objectStore("items");
 
-              // 還原資料夾
               if (Array.isArray(data.folders)) {
                 data.folders.forEach(f => {
                   if (!f.tab) f.tab = 'arrived';
@@ -1600,7 +1604,6 @@
                 });
               }
 
-              // 還原品項（自動補齊舊版本欠缺的新欄位）
               if (Array.isArray(data.items)) {
                 data.items.forEach(i => {
                   if (i.isForsale === undefined) i.isForsale = false;
@@ -1622,7 +1625,7 @@
             alert('解析失敗：檔案可能已損壞或格式不符。');
           }
         };
-        reader.readAsText(file); // 確保用 UTF-8 文字讀取 JSON
+        reader.readAsText(file);
       };
       input.click();
     }
