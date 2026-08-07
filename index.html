@@ -157,6 +157,25 @@
       font-size: 0.85rem;
       cursor: pointer;
     }
+
+    /* 分售子項目清單專用樣式 */
+    .split-item-card {
+      background: #fdfefe;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .split-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -263,12 +282,6 @@
       </div>
       
       <form id="item-form" onsubmit="event.preventDefault();">
-        <!-- 數量欄位 -->
-        <div class="form-group">
-          <label>數量</label>
-          <input type="number" id="field-quantity" class="form-control" value="1" min="1">
-        </div>
-
         <!-- 待售標籤勾選 -->
         <div class="form-group" style="background:var(--primary-light); padding:10px; border-radius:8px;">
           <label class="checkbox-inline">
@@ -327,7 +340,7 @@
             <input type="text" id="field-title" class="form-control" placeholder="例如：EXIST 藍色版">
           </div>
           <div class="form-group">
-            <label>3. 價格 (總價)</label>
+            <label>3. 價格 (總成本)</label>
             <input type="number" id="field-price" class="form-control" placeholder="0">
           </div>
           <div class="form-group">
@@ -349,6 +362,17 @@
             <textarea id="field-album-text" class="form-control" placeholder="文字說明..."></textarea>
             <label style="margin-top:6px;">內容物照片：</label>
             <div class="photo-uploader" id="uploader-album"></div>
+          </div>
+
+          <!-- 分售設定區塊 -->
+          <div class="form-group" style="background:#f4f6f9; padding:12px; border-radius:10px; border:1px solid var(--border-color);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label style="font-weight:700; color:var(--primary-dark);">🛍️ 分售設定</label>
+              <button type="button" class="btn-split" style="padding:4px 10px; font-size:0.75rem; margin:0; width:auto;" onclick="openSplitManagerModal()">管理/新增分售項目</button>
+            </div>
+            <div id="split-summary-box" style="font-size:0.8rem; color:var(--text-sub);">
+              無分售項目 (預設單件商品)
+            </div>
           </div>
 
           <div class="form-group">
@@ -548,34 +572,37 @@
 
         <!-- 按鈕群組 -->
         <button type="button" class="btn-submit" onclick="saveItem()">儲存此品項</button>
-        <button type="button" id="btn-split-action" class="btn-split" style="display:none;" onclick="openSplitModal()">✂️ 拆分部分數量轉待售</button>
         <button type="button" id="btn-transfer-action" class="btn-transfer" style="display:none;" onclick="openTransferModal()">已到貨，轉移至「在家/已到貨」</button>
-        <button type="button" id="btn-sell-action" class="btn-sell" style="display:none;" onclick="openSellModal()">💰 標記為「已售出」</button>
+        <button type="button" id="btn-sell-action" class="btn-sell" style="display:none;" onclick="openSellModal()">💰 標記整組為「已售出」</button>
         <button type="button" id="btn-remove-forsale-action" class="btn-delete" style="display:none; color:#f39c12;" onclick="removeForsaleStatus()">僅取消待售狀態</button>
         <button type="button" id="btn-delete-action" class="btn-delete" style="display:none;" onclick="deleteCurrentItem()">徹底刪除此品項</button>
       </form>
     </div>
   </div>
 
-  <!-- Split Modal (拆分數量彈窗) -->
-  <div class="modal" id="modal-split-dialog">
-    <div class="modal-content">
+  <!-- Split Manager Modal (分售清單管理) -->
+  <div class="modal" id="modal-split-manager">
+    <div class="modal-content" style="max-height:92vh;">
       <div class="modal-header">
-        <div class="modal-title">✂️ 拆分品項轉為待售</div>
-        <button class="close-btn" onclick="closeModal('modal-split-dialog')">✕</button>
+        <div class="modal-title">🛍️ 分售項目管理 (方案 A：合併結帳)</div>
+        <button class="close-btn" onclick="closeModal('modal-split-manager')">✕</button>
+      </div>
+      
+      <div class="form-group">
+        <label>總數量 (例如：5)</label>
+        <input type="number" id="split-total-qty" class="form-control" value="1" min="1" oninput="renderSplitItemsList()">
       </div>
       <div class="form-group">
-        <label id="split-current-qty-label">當前總數量：1 個</label>
+        <label>自留數量 (例如：2)</label>
+        <input type="number" id="split-keep-qty" class="form-control" value="0" min="0" oninput="renderSplitItemsList()">
       </div>
-      <div class="form-group">
-        <label>要拆出轉為「待售」的數量</label>
-        <input type="number" id="split-qty-input" class="form-control" value="1" min="1" oninput="calcSplitPriceAuto()">
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+        <label style="font-weight:700;">待售項目清單</label>
+        <button type="button" class="btn-sell" style="padding:6px 12px; font-size:0.8rem; margin:0; width:auto;" onclick="openBatchSellModal()">💰 勾選合併標記售出</button>
       </div>
-      <div class="form-group">
-        <label>拆出待售部分的「分攤成本金額」</label>
-        <input type="number" id="split-price-input" class="form-control" placeholder="0">
-      </div>
-      <button class="btn-split" onclick="executeSplitItem()">確認拆分並新增待售卡片</button>
+
+      <div id="split-items-container" style="margin-top:8px;"></div>
     </div>
   </div>
 
@@ -598,15 +625,15 @@
     </div>
   </div>
 
-  <!-- Sell Item Dialog Modal -->
+  <!-- Sell Item Dialog Modal (支援多選合併售出) -->
   <div class="modal" id="modal-sell-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">標記為已售出</div>
+        <div class="modal-title" id="sell-dialog-title">標記為已售出</div>
         <button class="close-btn" onclick="closeModal('modal-sell-dialog')">✕</button>
       </div>
       <div class="form-group">
-        <label>售出價格</label>
+        <label>售出總價格 (若為合併購買請填合售總價)</label>
         <input type="number" id="sell-price" class="form-control" placeholder="0">
       </div>
       <div class="form-group">
@@ -729,12 +756,14 @@
 
     // --- State & IndexedDB Init ---
     let db;
-    let currentTab = 'arrived'; // 'arrived', 'preorder', 'forsale'
+    let currentTab = 'arrived'; 
     let currentFolderId = null;
     let folderPath = [];
     let editingItemId = null;
     let editingFolderId = null;
-    let currentEditingItemObject = null; // 快取當前編輯的品項完整物件
+
+    let currentSplitData = { totalQty: 1, keepQty: 0, items: [] };
+    let selectedSplitIndicesForSell = []; // 當前準備合併售出的子項目索引
 
     let imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [], sellProofs: [], folderCover: [] };
 
@@ -922,7 +951,13 @@
           : `<div class="card-no-img">無圖片</div>`;
 
         const title = item.title || item.preTitle || item.category;
-        const qtyStr = (item.quantity && item.quantity > 1) ? ` [x${item.quantity}]` : '';
+        
+        let splitTag = '';
+        if (item.splitData && item.splitData.items && item.splitData.items.length > 0) {
+          const unsoldSplitCount = item.splitData.items.filter(si => !si.isSold).length;
+          splitTag = `<span class="badge" style="background:#8e44ad; color:white;">分售待售:${unsoldSplitCount}件</span>`;
+        }
+
         const priceDisplay = item.tab === 'arrived' ? `$${item.price || 0}` : getPreorderPriceBadge(item);
         
         let needSecondHtml = '';
@@ -931,10 +966,11 @@
 
         div.innerHTML = `
           ${coverHtml}
-          <div class="card-title">${title}${qtyStr}</div>
+          <div class="card-title">${title}</div>
           <div class="card-sub">${item.itemType}</div>
           <div class="badge-container">
             <span class="badge">${priceDisplay}</span>
+            ${splitTag}
             ${needSecondHtml}
             ${forsaleBadge}
           </div>
@@ -1062,9 +1098,10 @@
     // --- Open Item Modal ---
     function openItemModal(item = null) {
       editingItemId = item ? item.id : null;
-      currentEditingItemObject = item;
       document.getElementById('item-form').reset();
       imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [] };
+
+      currentSplitData = item && item.splitData ? JSON.parse(JSON.stringify(item.splitData)) : { totalQty: 1, keepQty: 0, items: [] };
 
       populateItemFolderSelects(item ? item.folderId : currentFolderId, item ? item.forsaleFolderId : null);
 
@@ -1075,12 +1112,10 @@
 
       document.getElementById('btn-delete-action').style.display = item ? 'block' : 'none';
       document.getElementById('btn-sell-action').style.display = item ? 'block' : 'none';
-      document.getElementById('btn-split-action').style.display = (item && item.quantity > 1) ? 'block' : 'none';
       document.getElementById('btn-transfer-action').style.display = (item && activeTabMode === 'preorder') ? 'block' : 'none';
       document.getElementById('btn-remove-forsale-action').style.display = (item && item.isForsale) ? 'block' : 'none';
 
       if (item) {
-        document.getElementById('field-quantity').value = item.quantity || 1;
         document.getElementById('field-is-forsale').checked = !!item.isForsale;
         document.getElementById('field-category').value = item.category || '專輯/EP';
         document.getElementById('field-item-type').value = item.itemType || '娃';
@@ -1127,12 +1162,26 @@
         }
       }
 
+      updateSplitSummaryUI();
       toggleForsaleFolderGroup();
       toggleAlbumFields();
       togglePaymentFlow();
       renderAllPhotoUploaders();
       
       openModal('modal-item');
+    }
+
+    function updateSplitSummaryUI() {
+      const summaryBox = document.getElementById('split-summary-box');
+      if (!currentSplitData.items || currentSplitData.items.length === 0) {
+        summaryBox.innerHTML = `無分售項目 (預設單件商品)`;
+      } else {
+        const total = currentSplitData.totalQty;
+        const keep = currentSplitData.keepQty;
+        const splitCount = currentSplitData.items.length;
+        const soldCount = currentSplitData.items.filter(i => i.isSold).length;
+        summaryBox.innerHTML = `總數 <b>${total}</b> 個 | 自留 <b>${keep}</b> 個 | 分售 <b>${splitCount}</b> 個 (已售出 ${soldCount}/${splitCount})`;
+      }
     }
 
     function toggleAlbumFields() {
@@ -1245,6 +1294,93 @@
       input.click();
     }
 
+    // --- Split Manager Logic (方案 A：分售清單 + 合併標記售出) ---
+    function openSplitManagerModal() {
+      document.getElementById('split-total-qty').value = currentSplitData.totalQty || 1;
+      document.getElementById('split-keep-qty').value = currentSplitData.keepQty || 0;
+      renderSplitItemsList();
+      openModal('modal-split-manager');
+    }
+
+    function renderSplitItemsList() {
+      const totalQty = parseInt(document.getElementById('split-total-qty').value) || 1;
+      const keepQty = parseInt(document.getElementById('split-keep-qty').value) || 0;
+      const splitCount = Math.max(0, totalQty - keepQty);
+
+      currentSplitData.totalQty = totalQty;
+      currentSplitData.keepQty = keepQty;
+
+      // 自動補齊或削減子項目
+      while (currentSplitData.items.length < splitCount) {
+        const idx = currentSplitData.items.length + 1;
+        currentSplitData.items.push({
+          name: `分售項目 #${idx}`,
+          price: 0,
+          isSold: false,
+          soldData: null
+        });
+      }
+      if (currentSplitData.items.length > splitCount) {
+        currentSplitData.items = currentSplitData.items.slice(0, splitCount);
+      }
+
+      const container = document.getElementById('split-items-container');
+      container.innerHTML = '';
+
+      if (splitCount === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">無分售項目 (全數自留)</div>`;
+        return;
+      }
+
+      currentSplitData.items.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'split-item-card';
+
+        const statusBadge = item.isSold 
+          ? `<span class="badge badge-danger">已售出 ($${item.soldData?.sellPrice || 0})</span>`
+          : `<span class="badge badge-success">待售中</span>`;
+
+        div.innerHTML = `
+          <div class="split-item-header">
+            <label class="checkbox-inline">
+              <input type="checkbox" class="split-checkbox" value="${idx}" ${item.isSold ? 'disabled' : ''}>
+              <span>${item.name}</span>
+            </label>
+            ${statusBadge}
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
+            <input type="text" class="form-control" style="padding:6px;" value="${item.name}" placeholder="自訂項目名稱" onchange="currentSplitData.items[${idx}].name=this.value" ${item.isSold?'disabled':''}>
+            <input type="number" class="form-control" style="padding:6px; width:90px;" value="${item.price||0}" placeholder="預設售價" onchange="currentSplitData.items[${idx}].price=parseFloat(this.value)||0" ${item.isSold?'disabled':''}>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      updateSplitSummaryUI();
+    }
+
+    function openBatchSellModal() {
+      const checkboxes = document.querySelectorAll('.split-checkbox:checked');
+      if (checkboxes.length === 0) {
+        return alert('請先勾選至少一個要售出的待售項目！');
+      }
+
+      selectedSplitIndicesForSell = Array.from(checkboxes).map(cb => parseInt(cb.value));
+      const names = selectedSplitIndicesForSell.map(idx => currentSplitData.items[idx].name).join('、');
+
+      // 預算勾選項目的總預設售價
+      const autoTotalPrice = selectedSplitIndicesForSell.reduce((sum, idx) => sum + (currentSplitData.items[idx].price || 0), 0);
+
+      document.getElementById('sell-dialog-title').innerText = `合併售出：${names}`;
+      document.getElementById('sell-price').value = autoTotalPrice;
+
+      imgStore.sellProofs = [];
+      renderUploader('uploader-sell-proofs', imgStore.sellProofs, 3, 'sellProofs');
+      document.getElementById('sell-date').value = new Date().toISOString().split('T')[0];
+
+      openModal('modal-sell-dialog');
+    }
+
     // --- Save Item ---
     function saveItem() {
       const selectedFolderValue = document.getElementById('field-folder-select').value;
@@ -1255,15 +1391,19 @@
 
       const activeTabMode = currentTab === 'forsale' ? 'arrived' : currentTab;
 
+      // 如果有分售項目且還有沒賣掉的，自動幫這張卡片勾選「待售」
+      const hasUnsoldSplit = currentSplitData.items && currentSplitData.items.some(si => !si.isSold);
+      const isForsaleChecked = document.getElementById('field-is-forsale').checked || hasUnsoldSplit;
+
       const itemData = {
         id: editingItemId || 'item_' + Date.now(),
-        quantity: parseInt(document.getElementById('field-quantity').value) || 1,
         tab: activeTabMode,
         folderId: targetFolderId,
-        isForsale: document.getElementById('field-is-forsale').checked,
+        isForsale: isForsaleChecked,
         forsaleFolderId: targetForsaleFolderId,
         category: document.getElementById('field-category').value,
         itemType: document.getElementById('field-item-type').value,
+        splitData: currentSplitData // 儲存方案 A 分售資料結構
       };
 
       if (activeTabMode === 'arrived') {
@@ -1320,78 +1460,7 @@
       const tx = db.transaction("items", "readwrite");
       tx.objectStore("items").put(itemData);
       tx.oncomplete = () => {
-        closeModal('modal-item');
-        renderGrid();
-      };
-    }
-
-    // --- Split Item Logic (拆分部分數量轉待售) ---
-    function openSplitModal() {
-      if (!currentEditingItemObject) return;
-      const totalQty = currentEditingItemObject.quantity || 1;
-      document.getElementById('split-current-qty-label').innerText = `當前總數量：${totalQty} 個`;
-      
-      const splitInput = document.getElementById('split-qty-input');
-      splitInput.max = totalQty - 1;
-      splitInput.value = 1;
-
-      calcSplitPriceAuto();
-      openModal('modal-split-dialog');
-    }
-
-    function calcSplitPriceAuto() {
-      if (!currentEditingItemObject) return;
-      const totalQty = currentEditingItemObject.quantity || 1;
-      const splitQty = parseInt(document.getElementById('split-qty-input').value) || 1;
-      
-      const totalPrice = currentEditingItemObject.price || currentEditingItemObject.fullTotal || 0;
-      if (totalPrice > 0 && totalQty > 0) {
-        const suggestedPrice = Math.round((totalPrice / totalQty) * splitQty);
-        document.getElementById('split-price-input').value = suggestedPrice;
-      }
-    }
-
-    function executeSplitItem() {
-      if (!currentEditingItemObject) return;
-      const origItem = currentEditingItemObject;
-      const totalQty = origItem.quantity || 1;
-      const splitQty = parseInt(document.getElementById('split-qty-input').value) || 1;
-      const splitPrice = parseFloat(document.getElementById('split-price-input').value) || 0;
-
-      if (splitQty >= totalQty || splitQty < 1) {
-        return alert(`拆分數量必須介於 1 到 ${totalQty - 1} 之間！`);
-      }
-
-      const origPrice = origItem.price || origItem.fullTotal || 0;
-      const remainingQty = totalQty - splitQty;
-      const remainingPrice = origPrice - splitPrice;
-      const titleName = origItem.title || origItem.preTitle || origItem.category;
-
-      // 1. 更新原卡片 (扣減數量與價格，寫入雙向履歷)
-      origItem.quantity = remainingQty;
-      if (origItem.tab === 'arrived') origItem.price = Math.max(0, remainingPrice);
-      const origHistoryNote = `\n📝 拆分履歷：已拆出 ${splitQty} 件轉待售（此剩餘 ${remainingQty} 件成本分攤 $${Math.max(0, remainingPrice)}）`;
-      if (origItem.tab === 'arrived') origItem.notes = (origItem.notes || '') + origHistoryNote;
-      else origItem.preNotes = (origItem.preNotes || '') + origHistoryNote;
-
-      // 2. 建立新待售卡片 (自動帶入原始大組合履歷)
-      const newItem = JSON.parse(JSON.stringify(origItem));
-      newItem.id = 'item_' + Date.now();
-      newItem.quantity = splitQty;
-      newItem.isForsale = true; // 強制勾選待售
-      if (newItem.tab === 'arrived') newItem.price = splitPrice;
-      
-      const newHistoryNote = `\n📝 拆分履歷：拆分自原始組合「${titleName}」（全套 ${totalQty} 件 / 總花費 $${origPrice}）`;
-      if (newItem.tab === 'arrived') newItem.notes = (newItem.notes || '') + newHistoryNote;
-      else newItem.preNotes = (newItem.preNotes || '') + newHistoryNote;
-
-      const tx = db.transaction("items", "readwrite");
-      tx.objectStore("items").put(origItem);
-      tx.objectStore("items").put(newItem);
-
-      tx.oncomplete = () => {
-        alert(`成功拆分！\n• 自留組：剩 ${remainingQty} 個 ($${Math.max(0, remainingPrice)})\n• 待售組：拆出 ${splitQty} 個 ($${splitPrice})`);
-        closeModal('modal-split-dialog');
+        closeModal('modal-split-manager');
         closeModal('modal-item');
         renderGrid();
       };
@@ -1432,7 +1501,6 @@
 
         const arrivedItem = {
           id: preItem.id,
-          quantity: preItem.quantity || 1,
           tab: 'arrived',
           folderId: targetFolderId,
           isForsale: preItem.isForsale,
@@ -1444,7 +1512,8 @@
           photos: preItem.prePhotos || [],
           proofs: preItem.preProofs || [],
           receivedDate: new Date().toISOString().split('T')[0],
-          album: [], albumText: '', notes: preItem.preNotes || '', info: infoText
+          album: [], albumText: '', notes: preItem.preNotes || '', info: infoText,
+          splitData: preItem.splitData
         };
 
         const writeTx = db.transaction("items", "readwrite");
@@ -1458,8 +1527,10 @@
       };
     }
 
-    // --- Mark as Sold Modal & Logic ---
+    // --- Mark as Sold Modal & Logic (方案 A 合併售出處理) ---
     function openSellModal() {
+      selectedSplitIndicesForSell = []; // 清空分售多選，代表標記整組卡片售出
+      document.getElementById('sell-dialog-title').innerText = '標記整組商品為已售出';
       imgStore.sellProofs = [];
       renderUploader('uploader-sell-proofs', imgStore.sellProofs, 3, 'sellProofs');
       document.getElementById('sell-date').value = new Date().toISOString().split('T')[0];
@@ -1481,28 +1552,63 @@
         const item = e.target.result;
         if (!item) return;
 
-        const originalCost = item.price || item.fullTotal || item.halfTotal || item.unpaidTotal || parseFloat(item.otherTotal) || 0;
-        const profit = sellPrice - originalCost;
+        // 如果是「分售項目」的勾選合併售出
+        if (selectedSplitIndicesForSell.length > 0) {
+          const splitPricePerItem = sellPrice / selectedSplitIndicesForSell.length; // 均分合售價格
+          selectedSplitIndicesForSell.forEach(idx => {
+            if (item.splitData && item.splitData.items[idx]) {
+              item.splitData.items[idx].isSold = true;
+              item.splitData.items[idx].soldData = {
+                sellPrice: splitPricePerItem,
+                platform: platformStr,
+                buyerType: buyerType,
+                buyerInfo: buyerInfo,
+                sellProofs: imgStore.sellProofs,
+                sellDate: sellDate
+              };
+            }
+          });
 
-        item.isSold = true;
-        item.soldData = {
-          sellPrice: sellPrice,
-          platform: platformStr,
-          buyerType: buyerType,
-          buyerInfo: buyerInfo,
-          sellProofs: imgStore.sellProofs,
-          sellDate: sellDate,
-          profit: profit
-        };
+          // 檢查是否所有分售項目都已賣完
+          const allSold = item.splitData.items.every(si => si.isSold);
+          if (allSold) {
+            item.isForsale = false; // 全數售出，從待售專區下架
+          }
 
-        const writeTx = db.transaction("items", "readwrite");
-        writeTx.objectStore("items").put(item);
-        writeTx.oncomplete = () => {
-          alert(`已成功移至「已售出歸檔庫」！(損益: $${profit})`);
-          closeModal('modal-sell-dialog');
-          closeModal('modal-item');
-          renderGrid();
-        };
+          const writeTx = db.transaction("items", "readwrite");
+          writeTx.objectStore("items").put(item);
+          writeTx.oncomplete = () => {
+            alert(`已成功將 ${selectedSplitIndicesForSell.length} 個勾選項目合併標記為已售出！`);
+            closeModal('modal-sell-dialog');
+            closeModal('modal-split-manager');
+            closeModal('modal-item');
+            renderGrid();
+          };
+        } else {
+          // 一般整組售出
+          const originalCost = item.price || item.fullTotal || item.halfTotal || item.unpaidTotal || parseFloat(item.otherTotal) || 0;
+          const profit = sellPrice - originalCost;
+
+          item.isSold = true;
+          item.soldData = {
+            sellPrice: sellPrice,
+            platform: platformStr,
+            buyerType: buyerType,
+            buyerInfo: buyerInfo,
+            sellProofs: imgStore.sellProofs,
+            sellDate: sellDate,
+            profit: profit
+          };
+
+          const writeTx = db.transaction("items", "readwrite");
+          writeTx.objectStore("items").put(item);
+          writeTx.oncomplete = () => {
+            alert(`已成功移至「已售出歸檔庫」！(損益: $${profit})`);
+            closeModal('modal-sell-dialog');
+            closeModal('modal-item');
+            renderGrid();
+          };
+        }
       };
     }
 
@@ -1547,6 +1653,7 @@
       tx.objectStore("items").getAll().onsuccess = (e) => {
         const allItems = e.target.result || [];
         allItems.forEach(item => {
+          // 1. 一般整組售出的紀錄
           if (item.isSold) {
             const title = item.title || item.preTitle || item.category;
             const buyerStr = item.soldData ? `${item.soldData.buyerType}: ${item.soldData.buyerInfo}` : '';
@@ -1558,7 +1665,7 @@
 
               div.innerHTML = `
                 <img src="${coverImg}" class="card-img" alt="圖">
-                <div class="card-title">${title} [x${item.quantity || 1}]</div>
+                <div class="card-title">${title} [整組]</div>
                 <div class="card-sub">售價: $${item.soldData?.sellPrice || 0} (${item.soldData?.platform || ''})</div>
                 <div class="badge-container">
                   <span class="badge ${item.soldData?.profit >= 0 ? 'badge-success' : 'badge-danger'}">損益: $${item.soldData?.profit || 0}</span>
@@ -1567,6 +1674,33 @@
               `;
               container.appendChild(div);
             }
+          }
+
+          // 2. 分售子項目的已售出紀錄
+          if (item.splitData && item.splitData.items) {
+            item.splitData.items.forEach((si, sIdx) => {
+              if (si.isSold) {
+                const parentTitle = item.title || item.preTitle || item.category;
+                const title = `${parentTitle} - ${si.name}`;
+                const buyerStr = si.soldData ? `${si.soldData.buyerType}: ${si.soldData.buyerInfo}` : '';
+
+                if (!keyword || (title + buyerStr + (si.soldData?.platform||'')).toLowerCase().includes(keyword)) {
+                  const div = document.createElement('div');
+                  div.className = 'card';
+                  let coverImg = (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '';
+
+                  div.innerHTML = `
+                    <img src="${coverImg}" class="card-img" alt="圖">
+                    <div class="card-title">${title}</div>
+                    <div class="card-sub">售價: $${si.soldData?.sellPrice || 0} (${si.soldData?.platform || ''})</div>
+                    <div class="badge-container">
+                      <span class="badge badge-success">買家: ${si.soldData?.buyerInfo || '未填'}</span>
+                    </div>
+                  `;
+                  container.appendChild(div);
+                }
+              }
+            });
           }
         });
       };
@@ -1588,7 +1722,7 @@
       };
     }
 
-    // --- Export Excel (包含數量資訊) ---
+    // --- Export Excel (匯出原生 .xlsx) ---
     function openExportModal() { openModal('modal-export'); }
 
     function toggleExportCatAll(allCb) {
@@ -1644,7 +1778,6 @@
           const category = i.category || '';
           const itemType = i.itemType || '';
           const name = i.title || i.preTitle || '';
-          const qty = i.quantity || 1;
           const date = i.receivedDate || i.preDate || '';
 
           let itemCost = 0; let shipFee = 0; let secondFee = 0; let unpaidAmount = 0;
@@ -1670,7 +1803,6 @@
             "分類": category,
             "品項": itemType,
             "名稱": name,
-            "數量": qty,
             "日期": date,
             "商品金額": itemCost,
             "運費": shipFee,
@@ -1690,7 +1822,7 @@
         XLSX.utils.book_append_sheet(workbook, worksheet, "週邊明細");
 
         const max_width = excelData.reduce((w, r) => Math.max(w, r.名稱 ? r.名稱.length : 10), 10);
-        worksheet['!cols'] = [ { wch: 8 }, { wch: 15 }, { wch: 10 }, { wch: Math.min(max_width + 5, 30) }, { wch: 6 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
+        worksheet['!cols'] = [ { wch: 8 }, { wch: 15 }, { wch: 10 }, { wch: Math.min(max_width + 5, 30) }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
 
         const todayStr = new Date().toISOString().split('T')[0];
         XLSX.writeFile(workbook, `週邊們_收支表_${todayStr}.xlsx`);
@@ -1745,7 +1877,6 @@
                 data.items.forEach(i => {
                   if (i.isForsale === undefined) i.isForsale = false;
                   if (i.isSold === undefined) i.isSold = false;
-                  if (i.quantity === undefined) i.quantity = 1;
                   if (!i.tab) i.tab = 'arrived';
                   if (!i.folderId) i.folderId = null;
                   itemStore.put(i);
