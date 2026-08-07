@@ -761,7 +761,7 @@
       renderGrid();
     }
 
-    // --- Render Items & Folders (含關鍵字、資料夾與日期區間多重過濾) ---
+    // --- Render Items & Folders (getAll 一次性讀取，徹底告別游標重複渲染) ---
     function renderGrid() {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
@@ -775,85 +775,72 @@
       const folderStore = tx.objectStore("folders");
       const itemStore = tx.objectStore("items");
 
-      let folders = [];
-      let itemMap = new Map(); // 使用 Map 徹底去重
+      folderStore.getAll().onsuccess = (e) => {
+        const allFolders = e.target.result || [];
+        itemStore.getAll().onsuccess = (e2) => {
+          const allItems = e2.target.result || [];
 
-      folderStore.openCursor().onsuccess = (e) => {
-        const cursor = e.target.result;
-        if (cursor) {
-          const f = cursor.value;
-          // 有設定日期區間時不顯示資料夾（直接專注過濾品項）
-          if (!dateStart && !dateEnd) {
-            if (searchKeyword) {
-              // 有關鍵字：資料夾名稱包含關鍵字才顯示
-              if (f.tab === currentTab && f.name.toLowerCase().includes(searchKeyword)) {
-                folders.push(f);
-              }
-            } else {
-              // 無關鍵字：只顯示目前目錄層級下的資料夾
-              if (f.tab === currentTab && f.parentId === currentFolderId) {
-                folders.push(f);
-              }
-            }
-          }
-          cursor.continue();
-        } else {
-          itemStore.openCursor().onsuccess = (e2) => {
-            const cursor2 = e2.target.result;
-            if (cursor2) {
-              const val = cursor2.value;
-              if (!val.isSold) {
-                const isGlobalSearch = searchKeyword || dateStart || dateEnd;
+          let folders = [];
+          let itemMap = new Map(); // 使用 Map 精準去重
 
-                if (isGlobalSearch) {
-                  // 全域/條件搜尋模式
-                  const matchTab = (currentTab === 'forsale') ? val.isForsale : (val.tab === currentTab);
-                  if (matchTab) {
-                    // 1. 關鍵字比對
-                    let matchKey = true;
-                    if (searchKeyword) {
-                      const searchSource = [
-                        val.title || '',
-                        val.preTitle || '',
-                        val.category || '',
-                        val.itemType || '',
-                        val.notes || '',
-                        val.info || '',
-                        val.albumText || ''
-                      ].join(' ').toLowerCase();
-                      matchKey = searchSource.includes(searchKeyword);
-                    }
+          const isGlobalSearch = searchKeyword || dateStart || dateEnd;
 
-                    // 2. 日期區間比對 (在家: receivedDate, 預購: preDate)
-                    let matchDate = true;
-                    const itemDate = val.tab === 'arrived' ? val.receivedDate : val.preDate;
-
-                    if (dateStart && (!itemDate || itemDate < dateStart)) matchDate = false;
-                    if (dateEnd && (!itemDate || itemDate > dateEnd)) matchDate = false;
-
-                    if (matchKey && matchDate) {
-                      itemMap.set(val.id, val);
-                    }
-                  }
+          // 1. 過濾資料夾
+          if (!dateStart && !dateEnd) { // 日期篩選時專注於商品
+            allFolders.forEach(f => {
+              if (f.tab === currentTab) {
+                if (searchKeyword) {
+                  if (f.name.toLowerCase().includes(searchKeyword)) folders.push(f);
                 } else {
-                  // 無任何條件時：正常依據目前資料夾層級顯示
-                  if (currentTab === 'forsale') {
-                    if (val.isForsale && val.forsaleFolderId === currentFolderId) {
-                      itemMap.set(val.id, val);
-                    }
-                  } else if (val.tab === currentTab && val.folderId === currentFolderId) {
-                    itemMap.set(val.id, val);
-                  }
+                  if (f.parentId === currentFolderId) folders.push(f);
                 }
               }
-              cursor2.continue();
-            } else {
-              let items = Array.from(itemMap.values());
-              sortItemList(items, sortType);
-              displayGridElements(folders, items);
+            });
+          }
+
+          // 2. 過濾商品品項
+          allItems.forEach(val => {
+            if (!val.isSold) {
+              if (isGlobalSearch) {
+                // 搜尋模式
+                const matchTab = (currentTab === 'forsale') ? val.isForsale : (val.tab === currentTab);
+                if (matchTab) {
+                  let matchKey = true;
+                  if (searchKeyword) {
+                    const searchSource = [
+                      val.title || '',
+                      val.preTitle || '',
+                      val.category || '',
+                      val.itemType || '',
+                      val.notes || '',
+                      val.info || '',
+                      val.albumText || ''
+                    ].join(' ').toLowerCase();
+                    matchKey = searchSource.includes(searchKeyword);
+                  }
+
+                  let matchDate = true;
+                  const itemDate = val.tab === 'arrived' ? val.receivedDate : val.preDate;
+                  if (dateStart && (!itemDate || itemDate < dateStart)) matchDate = false;
+                  if (dateEnd && (!itemDate || itemDate > dateEnd)) matchDate = false;
+
+                  if (matchKey && matchDate) itemMap.set(val.id, val);
+                }
+              } else {
+                // 正常層級瀏覽模式
+                if (currentTab === 'forsale') {
+                  if (val.isForsale && val.forsaleFolderId === currentFolderId) itemMap.set(val.id, val);
+                } else if (val.tab === currentTab && val.folderId === currentFolderId) {
+                  itemMap.set(val.id, val);
+                }
+              }
             }
-          };
-        }
+          });
+
+          let items = Array.from(itemMap.values());
+          sortItemList(items, sortType);
+          displayGridElements(folders, items);
+        };
       };
     }
 
@@ -871,6 +858,7 @@
 
     function displayGridElements(folders, items) {
       const container = document.getElementById('grid-container');
+      container.innerHTML = ''; // 再次防呆，確保每次渲染前均為空
 
       folders.forEach(f => {
         const div = document.createElement('div');
@@ -1451,10 +1439,9 @@
       const keyword = document.getElementById('sold-search-input').value.trim().toLowerCase();
 
       const tx = db.transaction("items", "readonly");
-      tx.objectStore("items").openCursor().onsuccess = (e) => {
-        const cursor = e.target.result;
-        if (cursor) {
-          const item = cursor.value;
+      tx.objectStore("items").getAll().onsuccess = (e) => {
+        const allItems = e.target.result || [];
+        allItems.forEach(item => {
           if (item.isSold) {
             const title = item.title || item.preTitle || item.category;
             const buyerStr = item.soldData ? `${item.soldData.buyerType}: ${item.soldData.buyerInfo}` : '';
@@ -1476,8 +1463,7 @@
               container.appendChild(div);
             }
           }
-          cursor.continue();
-        }
+        });
       };
     }
 
