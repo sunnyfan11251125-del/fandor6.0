@@ -73,8 +73,9 @@
       background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border-color);
       padding: 12px; display: flex; flex-direction: column; position: relative;
       box-shadow: 0 4px 12px rgba(148, 180, 203, 0.08);
+      cursor: pointer;
     }
-    .card-folder { border-left: 4px solid var(--primary-color); cursor: pointer; }
+    .card-folder { border-left: 4px solid var(--primary-color); }
     .card-img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: var(--primary-light); }
     .card-no-img {
       width: 100%; height: 110px; border-radius: 8px; margin-bottom: 8px;
@@ -175,6 +176,15 @@
       font-weight: 600;
       font-size: 0.85rem;
     }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+    }
+    .detail-label { font-weight: 600; color: var(--text-sub); }
+    .detail-value { font-weight: 600; color: var(--text-main); text-align: right; }
   </style>
 </head>
 <body>
@@ -579,7 +589,7 @@
     </div>
   </div>
 
-  <!-- Split Manager Modal (分售清單管理) -->
+  <!-- Split Manager Modal -->
   <div class="modal" id="modal-split-manager">
     <div class="modal-content" style="max-height:92vh;">
       <div class="modal-header">
@@ -651,7 +661,6 @@
         <input type="text" id="sell-platform-other" class="form-control other-input-block" placeholder="請填寫平台名稱">
       </div>
 
-      <!-- 買家資訊：三欄攤開獨立填寫 -->
       <div class="form-group" style="background:var(--primary-light); padding:10px; border-radius:10px;">
         <label style="color:var(--primary-dark); font-weight:700; margin-bottom:8px;">買家交易明細 (自由填寫)</label>
         <div class="form-group">
@@ -691,6 +700,18 @@
         <input type="text" id="sold-search-input" class="search-input" placeholder="在已售出項目中搜尋..." oninput="renderSoldArchiveList()">
       </div>
       <div id="sold-archive-list" class="grid" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- Sold Detail Modal (查看歸檔詳情彈窗) -->
+  <div class="modal" id="modal-sold-detail">
+    <div class="modal-content" style="max-height:90vh;">
+      <div class="modal-header">
+        <div class="modal-title">📄 已售出交易詳情</div>
+        <button class="close-btn" onclick="closeModal('modal-sold-detail')">✕</button>
+      </div>
+      <div id="sold-detail-body"></div>
+      <button type="button" class="btn-submit" style="background:#7f8c8d; margin-top:15px;" onclick="closeModal('modal-sold-detail')">關閉</button>
     </div>
   </div>
 
@@ -772,6 +793,7 @@
 
     let currentSplitData = { totalQty: 1, keepQty: 0, items: [] };
     let selectedSplitIndicesForSell = [];
+    let cachedArchiveMap = new Map(); // 用於詳情彈窗的快取
 
     let imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [], sellProofs: [], folderCover: [] };
 
@@ -912,7 +934,7 @@
       if (sortType === 'date-desc') {
         items.sort((a,b) => new Date(b.receivedDate || b.preDate || 0) - new Date(a.receivedDate || a.preDate || 0));
       } else if (sortType === 'date-asc') {
-        items.sort((a,b) => new Date(a.receivedDate || a.preDate || 0) - new Date(b.receivedDate || b.preDate || 0));
+        items.sort((a,b) => new Date(a.receivedDate || a.preDate || 0) - new Date(a.receivedDate || a.preDate || 0));
       } else if (sortType === 'price-desc') {
         items.sort((a,b) => (b.price || b.fullTotal || 0) - (a.price || a.fullTotal || 0));
       } else if (sortType === 'price-asc') {
@@ -1567,11 +1589,17 @@
         if (!item) return;
 
         if (selectedSplitIndicesForSell.length > 0) {
+          // 合併售出時分配一個唯一的 batchTxId
+          const batchTxId = 'batch_' + Date.now();
           const splitPricePerItem = sellPrice / selectedSplitIndicesForSell.length;
+
           selectedSplitIndicesForSell.forEach(idx => {
             if (item.splitData && item.splitData.items[idx]) {
               item.splitData.items[idx].isSold = true;
               item.splitData.items[idx].soldData = {
+                batchTxId: batchTxId,
+                totalBatchPrice: sellPrice,
+                batchIndices: selectedSplitIndicesForSell,
                 sellPrice: splitPricePerItem,
                 platform: platformStr,
                 buyerNickname: buyerNickname,
@@ -1590,6 +1618,7 @@
 
           tx.objectStore("items").put(item);
         } else {
+          // 一般整組售出
           const originalCost = item.price || item.fullTotal || item.halfTotal || item.unpaidTotal || parseFloat(item.otherTotal) || 0;
           const profit = sellPrice - originalCost;
 
@@ -1644,7 +1673,7 @@
       };
     }
 
-    // --- Sold Archive Grid & Restore (徹底修正重複卡片與補上分售復原功能) ---
+    // --- Sold Archive Grid & Details Modal (強效防洗版去重 + 合併交易歸檔 + 詳情彈窗) ---
     function openSoldArchiveModal() {
       renderSoldArchiveList();
       openModal('modal-sold-archive');
@@ -1652,119 +1681,193 @@
 
     function renderSoldArchiveList() {
       const container = document.getElementById('sold-archive-list');
-      container.innerHTML = ''; // 清空對抗重複列印
+      container.innerHTML = ''; // 每次渲染強制清空
+
       const keyword = document.getElementById('sold-search-input').value.trim().toLowerCase();
 
       const tx = db.transaction("items", "readonly");
       tx.objectStore("items").getAll().onsuccess = (e) => {
         const allItems = e.target.result || [];
-        let soldCardMap = new Map(); // 使用 Map 做去重鎖定
+        cachedArchiveMap.clear();
 
         allItems.forEach(item => {
-          // 1. 一般整組售出的紀錄
+          const parentTitle = item.title || item.preTitle || item.category;
+
+          // 1. 一般整組售出
           if (item.isSold) {
-            const title = item.title || item.preTitle || item.category;
             const buyerStr = item.soldData ? `${item.soldData.buyerNickname||''} ${item.soldData.buyerOrderNo||''} ${item.soldData.buyerExtra||''}` : '';
             
-            if (!keyword || (title + buyerStr + (item.soldData?.platform||'')).toLowerCase().includes(keyword)) {
-              soldCardMap.set(`full_${item.id}`, {
+            if (!keyword || (parentTitle + buyerStr + (item.soldData?.platform||'')).toLowerCase().includes(keyword)) {
+              cachedArchiveMap.set(`full_${item.id}`, {
                 type: 'full',
-                itemId: item.id,
-                title: `${title} [整組]`,
+                itemObj: item,
+                cardKey: `full_${item.id}`,
+                title: `${parentTitle} [整組]`,
                 sellPrice: item.soldData?.sellPrice || 0,
                 platform: item.soldData?.platform || '',
                 profit: item.soldData?.profit || 0,
                 coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
-                buyerInfo: item.soldData?.buyerNickname || '整組售出'
+                buyerNickname: item.soldData?.buyerNickname || '買家明細',
+                buyerOrderNo: item.soldData?.buyerOrderNo || '',
+                buyerExtra: item.soldData?.buyerExtra || '',
+                sellDate: item.soldData?.sellDate || '',
+                proofs: item.soldData?.sellProofs || []
               });
             }
           }
 
-          // 2. 分售子項目的已售出紀錄
+          // 2. 分售子項目售出（含單獨與合併售出去重聚合）
           if (item.splitData && item.splitData.items) {
             item.splitData.items.forEach((si, sIdx) => {
-              if (si.isSold) {
-                const parentTitle = item.title || item.preTitle || item.category;
-                const title = `${parentTitle} - ${si.name}`;
-                const buyerStr = si.soldData ? `${si.soldData.buyerNickname||''} ${si.soldData.buyerOrderNo||''} ${si.soldData.buyerExtra||''}` : '';
+              if (si.isSold && si.soldData) {
+                const buyerStr = `${si.soldData.buyerNickname||''} ${si.soldData.buyerOrderNo||''} ${si.soldData.buyerExtra||''}`;
+                const matchKeyword = !keyword || (parentTitle + si.name + buyerStr + (si.soldData.platform||'')).toLowerCase().includes(keyword);
 
-                if (!keyword || (title + buyerStr + (si.soldData?.platform||'')).toLowerCase().includes(keyword)) {
-                  soldCardMap.set(`split_${item.id}_${sIdx}`, {
-                    type: 'split',
-                    itemId: item.id,
-                    splitIdx: sIdx,
-                    title: title,
-                    sellPrice: si.soldData?.sellPrice || 0,
-                    platform: si.soldData?.platform || '',
-                    coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
-                    buyerInfo: si.soldData?.buyerNickname || '買家明細'
-                  });
+                if (matchKeyword) {
+                  // 如果是合併交易 (含有 batchTxId)
+                  if (si.soldData.batchTxId) {
+                    const batchKey = `batch_${item.id}_${si.soldData.batchTxId}`;
+                    if (!cachedArchiveMap.has(batchKey)) {
+                      // 自動將同一次交易合併名稱
+                      const batchIndices = si.soldData.batchIndices || [sIdx];
+                      const batchNames = batchIndices.map(idx => item.splitData.items[idx]?.name || `#${idx+1}`).join('、');
+
+                      cachedArchiveMap.set(batchKey, {
+                        type: 'split_batch',
+                        itemObj: item,
+                        cardKey: batchKey,
+                        batchIndices: batchIndices,
+                        title: `${parentTitle} (分售: ${batchNames})`,
+                        sellPrice: si.soldData.totalBatchPrice || (si.soldData.sellPrice * batchIndices.length),
+                        platform: si.soldData.platform || '',
+                        coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
+                        buyerNickname: si.soldData.buyerNickname || '買家明細',
+                        buyerOrderNo: si.soldData.buyerOrderNo || '',
+                        buyerExtra: si.soldData.buyerExtra || '',
+                        sellDate: si.soldData.sellDate || '',
+                        proofs: si.soldData.sellProofs || []
+                      });
+                    }
+                  } else {
+                    // 單獨分售項目
+                    const singleKey = `split_${item.id}_${sIdx}`;
+                    cachedArchiveMap.set(singleKey, {
+                      type: 'split_single',
+                      itemObj: item,
+                      splitIdx: sIdx,
+                      cardKey: singleKey,
+                      title: `${parentTitle} - ${si.name}`,
+                      sellPrice: si.soldData.sellPrice || 0,
+                      platform: si.soldData.platform || '',
+                      coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
+                      buyerNickname: si.soldData.buyerNickname || '買家明細',
+                      buyerOrderNo: si.soldData.buyerOrderNo || '',
+                      buyerExtra: si.soldData.buyerExtra || '',
+                      sellDate: si.soldData.sellDate || '',
+                      proofs: si.soldData.sellProofs || []
+                    });
+                  }
                 }
               }
             });
           }
         });
 
-        // 渲染去重後的卡片清單
-        soldCardMap.forEach((card, key) => {
+        // 絕對去重渲染
+        cachedArchiveMap.forEach((card, key) => {
           const div = document.createElement('div');
           div.className = 'card';
+          div.onclick = () => openSoldDetailModal(key);
 
-          if (card.type === 'full') {
-            div.innerHTML = `
-              <img src="${card.coverImg}" class="card-img" alt="圖">
-              <div class="card-title">${card.title}</div>
-              <div class="card-sub">售價: $${card.sellPrice} (${card.platform})</div>
-              <div class="badge-container">
-                <span class="badge ${card.profit >= 0 ? 'badge-success' : 'badge-danger'}">損益: $${card.profit}</span>
-              </div>
-              <button onclick="restoreSoldItem('${card.itemId}')" style="margin-top:8px; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.75rem;">復原 (取消整組售出)</button>
-            `;
-          } else {
-            div.innerHTML = `
-              <img src="${card.coverImg}" class="card-img" alt="圖">
-              <div class="card-title">${card.title}</div>
-              <div class="card-sub">售價: $${card.sellPrice} (${card.platform})</div>
-              <div class="badge-container">
-                <span class="badge badge-success">買家: ${card.buyerInfo}</span>
-              </div>
-              <button onclick="restoreSplitSoldItem('${card.itemId}', ${card.splitIdx})" style="margin-top:8px; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.75rem;">復原 (取消分售售出)</button>
-            `;
-          }
+          let badgeHtml = card.type === 'full' 
+            ? `<span class="badge ${card.profit >= 0 ? 'badge-success' : 'badge-danger'}">損益: $${card.profit}</span>`
+            : `<span class="badge badge-success">買家: ${card.buyerNickname||'明細'}</span>`;
+
+          let coverHtml = card.coverImg 
+            ? `<img src="${card.coverImg}" class="card-img" alt="圖">`
+            : `<div class="card-no-img">無圖片</div>`;
+
+          div.innerHTML = `
+            ${coverHtml}
+            <div class="card-title">${card.title}</div>
+            <div class="card-sub">售價: $${card.sellPrice} (${card.platform})</div>
+            <div class="badge-container">
+              ${badgeHtml}
+            </div>
+            <button onclick="event.stopPropagation(); executeArchiveRestore('${key}')" style="margin-top:8px; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.75rem;">復原 (取消售出)</button>
+          `;
           container.appendChild(div);
         });
       };
     }
 
-    function restoreSoldItem(itemId) {
-      if (!confirm('是否將此品項取消售出並復原回原本的資料夾？')) return;
-      const tx = db.transaction("items", "readwrite");
-      tx.objectStore("items").get(itemId).onsuccess = (e) => {
-        const item = e.target.result;
-        if (item) {
-          item.isSold = false;
-          tx.objectStore("items").put(item);
-        }
-      };
-      tx.oncomplete = () => {
-        renderSoldArchiveList();
-        renderGrid();
-      };
+    // --- 查看歸檔詳情彈窗 ---
+    function openSoldDetailModal(cardKey) {
+      const data = cachedArchiveMap.get(cardKey);
+      if (!data) return;
+
+      const body = document.getElementById('sold-detail-body');
+      
+      let proofImgsHtml = '無憑證照片';
+      if (data.proofs && data.proofs.length > 0) {
+        proofImgsHtml = data.proofs.map(src => `<img src="${src}" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--border-color);">`).join(' ');
+      }
+
+      body.innerHTML = `
+        <div class="detail-row"><span class="detail-label">售出名稱</span><span class="detail-value">${data.title}</span></div>
+        <div class="detail-row"><span class="detail-label">實際總售價</span><span class="detail-value" style="color:var(--success-color); font-size:1rem;">$${data.sellPrice}</span></div>
+        <div class="detail-row"><span class="detail-label">販售平台</span><span class="detail-value">${data.platform || '未填'}</span></div>
+        <div class="detail-row"><span class="detail-label">售出日期</span><span class="detail-value">${data.sellDate || '未填'}</span></div>
+        <div class="detail-row"><span class="detail-label">買家暱稱 / ID</span><span class="detail-value">${data.buyerNickname || '未填'}</span></div>
+        <div class="detail-row"><span class="detail-label">訂單單號</span><span class="detail-value">${data.buyerOrderNo || '未填'}</span></div>
+        <div class="detail-row"><span class="detail-label">交易備註</span><span class="detail-value">${data.buyerExtra || '無'}</span></div>
+        <div style="margin-top:12px;">
+          <label class="detail-label" style="display:block; margin-bottom:6px;">交易憑證截圖：</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">${proofImgsHtml}</div>
+        </div>
+        <button type="button" class="btn-delete" style="margin-top:20px; font-weight:600;" onclick="executeArchiveRestore('${cardKey}'); closeModal('modal-sold-detail');">復原此交易 (取消售出)</button>
+      `;
+
+      openModal('modal-sold-detail');
     }
 
-    function restoreSplitSoldItem(itemId, splitIdx) {
-      if (!confirm('是否取消這個分售項目的售出狀態，重新放回待售清單？')) return;
+    // 通用歸檔復原執行函數 (支援整組、單獨分售、合併分售)
+    function executeArchiveRestore(cardKey) {
+      const data = cachedArchiveMap.get(cardKey);
+      if (!data) return;
+
+      if (!confirm(`確定要復原「${data.title}」的售出狀態嗎？`)) return;
+
       const tx = db.transaction("items", "readwrite");
-      tx.objectStore("items").get(itemId).onsuccess = (e) => {
+      tx.objectStore("items").get(data.itemObj.id).onsuccess = (e) => {
         const item = e.target.result;
-        if (item && item.splitData && item.splitData.items[splitIdx]) {
-          item.splitData.items[splitIdx].isSold = false;
-          item.splitData.items[splitIdx].soldData = null;
-          item.isForsale = true; // 重新設為待售
-          tx.objectStore("items").put(item);
+        if (!item) return;
+
+        if (data.type === 'full') {
+          item.isSold = false;
+        } else if (data.type === 'split_single') {
+          if (item.splitData && item.splitData.items[data.splitIdx]) {
+            item.splitData.items[data.splitIdx].isSold = false;
+            item.splitData.items[data.splitIdx].soldData = null;
+            item.isForsale = true;
+          }
+        } else if (data.type === 'split_batch') {
+          if (item.splitData && item.splitData.items) {
+            data.batchIndices.forEach(idx => {
+              if (item.splitData.items[idx]) {
+                item.splitData.items[idx].isSold = false;
+                item.splitData.items[idx].soldData = null;
+              }
+            });
+            item.isForsale = true;
+          }
         }
+
+        tx.objectStore("items").put(item);
       };
+
       tx.oncomplete = () => {
+        alert('成功復原！項目已重新回到對應清單中。');
         renderSoldArchiveList();
         renderGrid();
       };
