@@ -697,7 +697,7 @@
         <button class="close-btn" onclick="closeModal('modal-sold-archive')">✕</button>
       </div>
       <div class="form-group">
-        <input type="text" id="sold-search-input" class="search-input" placeholder="在已售出項目中搜尋..." oninput="debouncedRenderSoldArchive()">
+        <input type="text" id="sold-search-input" class="search-input" placeholder="在已售出項目中搜尋..." oninput="debouncedRenderSoldArchiveList()">
       </div>
       <div id="sold-archive-list" class="grid" style="margin-top:10px;"></div>
     </div>
@@ -719,7 +719,7 @@
   <div class="modal" id="modal-export">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">📊 匯出收支表 (Excel)</div>
+        <div class="modal-title">📊 匯出單排對帳流水帳 (Excel)</div>
         <button class="close-btn" onclick="closeModal('modal-export')">✕</button>
       </div>
       <div class="form-group">
@@ -752,10 +752,10 @@
       </div>
       <div class="form-group">
         <label class="checkbox-inline">
-          <input type="checkbox" id="export-include-sold"> 包含已售出紀錄
+          <input type="checkbox" id="export-include-sold" checked> 包含已售出紀錄
         </label>
       </div>
-      <button class="btn-submit" onclick="executeExportXlsx()">下載單排流水帳 (.xlsx) 收支表</button>
+      <button class="btn-submit" onclick="executeExportXlsx()">下載單排對帳流水帳 Excel (.xlsx)</button>
     </div>
   </div>
 
@@ -1590,7 +1590,7 @@
         if (!item) return;
 
         if (selectedSplitIndicesForSell.length > 0) {
-          const batchTxId = 'batch_' + Date.now();
+          const batchTxId = 'tx_' + Date.now();
           const splitPricePerItem = sellPrice / selectedSplitIndicesForSell.length;
 
           selectedSplitIndicesForSell.forEach(idx => {
@@ -1672,22 +1672,22 @@
       };
     }
 
-    // --- Debounced Sold Archive Render (徹底消除連續觸發重複) ---
-    function debouncedRenderSoldArchive() {
-      clearTimeout(archiveDebounceTimer);
-      archiveDebounceTimer = setTimeout(() => {
-        renderSoldArchiveList();
-      }, 200);
-    }
-
+    // --- Sold Archive Grid & Restore (含 Debounce 事件防洗版 + 強效 Key 去重 + 即時最新名稱) ---
     function openSoldArchiveModal() {
       renderSoldArchiveList();
       openModal('modal-sold-archive');
     }
 
+    function debouncedRenderSoldArchiveList() {
+      if (archiveDebounceTimer) clearTimeout(archiveDebounceTimer);
+      archiveDebounceTimer = setTimeout(() => {
+        renderSoldArchiveList();
+      }, 250);
+    }
+
     function renderSoldArchiveList() {
       const container = document.getElementById('sold-archive-list');
-      container.innerHTML = ''; // 每次繪製強制清空
+      container.innerHTML = '';
 
       const keyword = document.getElementById('sold-search-input').value.trim().toLowerCase();
 
@@ -1722,11 +1722,11 @@
             }
           }
 
-          // 2. 分售子項目售出（即時讀取最新 item.name 並以純粹 Key 去重）
+          // 2. 分售子項目售出 (精準抓取最新 item.name，對抗預設名稱)
           if (item.splitData && item.splitData.items) {
             item.splitData.items.forEach((si, sIdx) => {
               if (si.isSold && si.soldData) {
-                const currentName = si.name || `#${sIdx+1}`; // 即時讀取最新名稱
+                const currentName = si.name || `#${sIdx+1}`;
                 const buyerStr = `${si.soldData.buyerNickname||''} ${si.soldData.buyerOrderNo||''} ${si.soldData.buyerExtra||''}`;
                 const matchKeyword = !keyword || (parentTitle + currentName + buyerStr + (si.soldData.platform||'')).toLowerCase().includes(keyword);
 
@@ -1777,7 +1777,7 @@
           }
         });
 
-        // 渲染去重卡片
+        // 渲染極致去重後的清單
         cachedArchiveMap.forEach((card, key) => {
           const div = document.createElement('div');
           div.className = 'card';
@@ -1876,7 +1876,7 @@
       };
     }
 
-    // --- Export Excel (單排流水帳極簡架構) ---
+    // --- Export Excel (單排流水帳 + 時間軸正序 + 自留成本試算) ---
     function openExportModal() { openModal('modal-export'); }
 
     function toggleExportCatAll(allCb) {
@@ -1927,67 +1927,98 @@
           items = items.filter(i => selectedCategories.includes(i.category));
         }
 
-        let excelData = [];
-        let rowIdx = 2; // 從 Sheet 第 2 列開始 (第 1 列為表頭)
+        let rawRows = [];
 
         items.forEach(i => {
-          const parentTitle = i.title || i.preTitle || i.category;
-          const date = i.receivedDate || i.preDate || '';
-          let totalCost = i.price || i.fullTotal || i.halfTotal || i.unpaidTotal || parseFloat(i.otherTotal) || 0;
+          const parentTitle = i.title || i.preTitle || i.category || '未命名週邊';
+          const baseDate = i.receivedDate || i.preDate || '2026-01-01';
+          const totalCost = i.price || i.fullTotal || i.halfTotal || i.unpaidTotal || parseFloat(i.otherTotal) || 0;
 
+          // 處理分售（平舖扁平單排流水帳）
           if (i.splitData && i.splitData.items && i.splitData.items.length > 0) {
             const totalQty = i.splitData.totalQty || 1;
+            const keepQty = i.splitData.keepQty || 0;
+            const perItemCost = totalCost / totalQty;
 
-            i.splitData.items.forEach(si => {
+            // 1. 自留部分流水帳列
+            if (keepQty > 0) {
+              const keepCost = perItemCost * keepQty;
+              rawRows.push({
+                date: baseDate,
+                name: `${parentTitle} (自留 ${keepQty} 件)`,
+                totalCost: totalCost,
+                unitCost: keepCost,
+                sellPrice: 0,
+                profitFormula: 0 - keepCost, // 自留支出
+                buyerNickname: '-',
+                buyerOrderNo: '-',
+                platform: '-'
+              });
+            }
+
+            // 2. 分售項目流水帳列
+            i.splitData.items.forEach((si, sIdx) => {
               if (includeSold || !si.isSold) {
+                const sellDate = si.soldData?.sellDate || baseDate;
                 const sellPrice = si.isSold ? (si.soldData?.sellPrice || 0) : 0;
 
-                excelData.push({
-                  "日期": si.soldData?.sellDate || date,
-                  "商品名稱/分售備註": `${parentTitle} (${si.name})`,
-                  "進貨總成本": totalCost,
-                  "單件進貨成本": { t: 'n', f: `C${rowIdx}/${totalQty}` }, // 自動 Excel 原生公式 =C2/5
-                  "實際售價": sellPrice,
-                  "單筆損益": { t: 'n', f: `E${rowIdx}-D${rowIdx}` },   // 自動 Excel 原生公式 =E2-D2
-                  "買家暱稱": si.soldData?.buyerNickname || '-',
-                  "訂單單號": si.soldData?.buyerOrderNo || '-',
-                  "平台": si.soldData?.platform || '-'
+                rawRows.push({
+                  date: sellDate,
+                  name: `${parentTitle} - ${si.name||`分售#${sIdx+1}`}`,
+                  totalCost: totalCost,
+                  unitCost: perItemCost,
+                  sellPrice: sellPrice,
+                  profitFormula: si.isSold ? (sellPrice - perItemCost) : (0 - perItemCost),
+                  buyerNickname: si.soldData?.buyerNickname || '-',
+                  buyerOrderNo: si.soldData?.buyerOrderNo || '-',
+                  platform: si.soldData?.platform || '-'
                 });
-                rowIdx++;
               }
             });
           } else {
-            // 一般單件商品
-            const sellPrice = i.isSold ? (i.soldData?.sellPrice || 0) : 0;
-
-            excelData.push({
-              "日期": i.soldData?.sellDate || date,
-              "商品名稱/分售備註": parentTitle,
-              "進貨總成本": totalCost,
-              "單件進貨成本": totalCost,
-              "實際售價": sellPrice,
-              "單筆損益": { t: 'n', f: `E${rowIdx}-D${rowIdx}` },
-              "買家暱稱": i.soldData?.buyerNickname || '-',
-              "訂單單號": i.soldData?.buyerOrderNo || '-',
-              "平台": i.soldData?.platform || '-'
+            // 一般單件商品流水帳列
+            rawRows.push({
+              date: baseDate,
+              name: parentTitle,
+              totalCost: totalCost,
+              unitCost: totalCost,
+              sellPrice: i.isSold ? (i.soldData?.sellPrice || 0) : 0,
+              profitFormula: i.isSold ? ((i.soldData?.sellPrice || 0) - totalCost) : (0 - totalCost),
+              buyerNickname: i.soldData?.buyerNickname || '-',
+              buyerOrderNo: i.soldData?.buyerOrderNo || '-',
+              platform: i.soldData?.platform || '-'
             });
-            rowIdx++;
           }
         });
 
-        if (excelData.length === 0) {
+        // 按日期由舊到新正序排列
+        rawRows.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+        if (rawRows.length === 0) {
           alert('當前選擇的條件下沒有資料可以匯出！');
           return;
         }
+
+        const excelData = rawRows.map(r => ({
+          "日期": r.date,
+          "商品名稱 / 分售備註": r.name,
+          "進貨總成本": r.totalCost,
+          "單件進貨成本": r.unitCost,
+          "實際售價": r.sellPrice,
+          "單筆損益": r.profitFormula,
+          "買家暱稱": r.buyerNickname,
+          "訂單單號": r.buyerOrderNo,
+          "平台": r.platform
+        }));
 
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "單排對帳流水帳");
 
-        worksheet['!cols'] = [ { wch: 12 }, { wch: 25 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 18 }, { wch: 10 } ];
+        worksheet['!cols'] = [ { wch: 12 }, { wch: 28 }, { wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 18 }, { wch: 10 } ];
 
         const todayStr = new Date().toISOString().split('T')[0];
-        XLSX.writeFile(workbook, `週邊們_單排流水帳對帳表_${todayStr}.xlsx`);
+        XLSX.writeFile(workbook, `週邊們_單排對帳流水帳_${todayStr}.xlsx`);
 
         closeModal('modal-export');
       };
