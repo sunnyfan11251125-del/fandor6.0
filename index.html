@@ -332,7 +332,7 @@
           </select>
         </div>
 
-        <!-- 通用分售設定區塊 (現貨與預購均全面開放) -->
+        <!-- 通用分售設定區塊 -->
         <div class="form-group" style="background:#f4f6f9; padding:12px; border-radius:10px; border:1px solid var(--border-color);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <label style="font-weight:700; color:var(--primary-dark);">🛍️ 分售設定</label>
@@ -624,7 +624,7 @@
     </div>
   </div>
 
-  <!-- Sell Item Dialog Modal (更新：KOCA 平台 + 買家資訊三欄並列) -->
+  <!-- Sell Item Dialog Modal -->
   <div class="modal" id="modal-sell-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -1475,7 +1475,7 @@
       };
     }
 
-    // --- Transfer Dialog & Logic (預購轉現貨完整保留分售連動) ---
+    // --- Transfer Dialog & Logic ---
     function openTransferModal() {
       const select = document.getElementById('transfer-target-folder');
       select.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
@@ -1522,7 +1522,7 @@
           proofs: preItem.preProofs || [],
           receivedDate: new Date().toISOString().split('T')[0],
           album: [], albumText: '', notes: preItem.preNotes || '', info: infoText,
-          splitData: preItem.splitData // 分售紀錄無縫轉移
+          splitData: preItem.splitData
         };
 
         const writeTx = db.transaction("items", "readwrite");
@@ -1567,7 +1567,6 @@
         if (!item) return;
 
         if (selectedSplitIndicesForSell.length > 0) {
-          // 分售項目合併售出
           const splitPricePerItem = sellPrice / selectedSplitIndicesForSell.length;
           selectedSplitIndicesForSell.forEach(idx => {
             if (item.splitData && item.splitData.items[idx]) {
@@ -1591,7 +1590,6 @@
 
           tx.objectStore("items").put(item);
         } else {
-          // 一般整組售出
           const originalCost = item.price || item.fullTotal || item.halfTotal || item.unpaidTotal || parseFloat(item.otherTotal) || 0;
           const profit = sellPrice - originalCost;
 
@@ -1646,7 +1644,7 @@
       };
     }
 
-    // --- Sold Archive Grid & Restore ---
+    // --- Sold Archive Grid & Restore (徹底修正重複卡片與補上分售復原功能) ---
     function openSoldArchiveModal() {
       renderSoldArchiveList();
       openModal('modal-sold-archive');
@@ -1654,35 +1652,35 @@
 
     function renderSoldArchiveList() {
       const container = document.getElementById('sold-archive-list');
-      container.innerHTML = '';
+      container.innerHTML = ''; // 清空對抗重複列印
       const keyword = document.getElementById('sold-search-input').value.trim().toLowerCase();
 
       const tx = db.transaction("items", "readonly");
       tx.objectStore("items").getAll().onsuccess = (e) => {
         const allItems = e.target.result || [];
+        let soldCardMap = new Map(); // 使用 Map 做去重鎖定
+
         allItems.forEach(item => {
+          // 1. 一般整組售出的紀錄
           if (item.isSold) {
             const title = item.title || item.preTitle || item.category;
-            const buyerStr = item.soldData ? `${item.soldData.buyerNickname} ${item.soldData.buyerOrderNo} ${item.soldData.buyerExtra}` : '';
+            const buyerStr = item.soldData ? `${item.soldData.buyerNickname||''} ${item.soldData.buyerOrderNo||''} ${item.soldData.buyerExtra||''}` : '';
             
             if (!keyword || (title + buyerStr + (item.soldData?.platform||'')).toLowerCase().includes(keyword)) {
-              const div = document.createElement('div');
-              div.className = 'card';
-              let coverImg = (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '';
-
-              div.innerHTML = `
-                <img src="${coverImg}" class="card-img" alt="圖">
-                <div class="card-title">${title} [整組]</div>
-                <div class="card-sub">售價: $${item.soldData?.sellPrice || 0} (${item.soldData?.platform || ''})</div>
-                <div class="badge-container">
-                  <span class="badge ${item.soldData?.profit >= 0 ? 'badge-success' : 'badge-danger'}">損益: $${item.soldData?.profit || 0}</span>
-                </div>
-                <button onclick="restoreSoldItem('${item.id}')" style="margin-top:8px; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.75rem;">復原(取消售出)</button>
-              `;
-              container.appendChild(div);
+              soldCardMap.set(`full_${item.id}`, {
+                type: 'full',
+                itemId: item.id,
+                title: `${title} [整組]`,
+                sellPrice: item.soldData?.sellPrice || 0,
+                platform: item.soldData?.platform || '',
+                profit: item.soldData?.profit || 0,
+                coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
+                buyerInfo: item.soldData?.buyerNickname || '整組售出'
+              });
             }
           }
 
+          // 2. 分售子項目的已售出紀錄
           if (item.splitData && item.splitData.items) {
             item.splitData.items.forEach((si, sIdx) => {
               if (si.isSold) {
@@ -1691,23 +1689,49 @@
                 const buyerStr = si.soldData ? `${si.soldData.buyerNickname||''} ${si.soldData.buyerOrderNo||''} ${si.soldData.buyerExtra||''}` : '';
 
                 if (!keyword || (title + buyerStr + (si.soldData?.platform||'')).toLowerCase().includes(keyword)) {
-                  const div = document.createElement('div');
-                  div.className = 'card';
-                  let coverImg = (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '';
-
-                  div.innerHTML = `
-                    <img src="${coverImg}" class="card-img" alt="圖">
-                    <div class="card-title">${title}</div>
-                    <div class="card-sub">售價: $${si.soldData?.sellPrice || 0} (${si.soldData?.platform || ''})</div>
-                    <div class="badge-container">
-                      <span class="badge badge-success">買家: ${si.soldData?.buyerNickname || '買家明細'}</span>
-                    </div>
-                  `;
-                  container.appendChild(div);
+                  soldCardMap.set(`split_${item.id}_${sIdx}`, {
+                    type: 'split',
+                    itemId: item.id,
+                    splitIdx: sIdx,
+                    title: title,
+                    sellPrice: si.soldData?.sellPrice || 0,
+                    platform: si.soldData?.platform || '',
+                    coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
+                    buyerInfo: si.soldData?.buyerNickname || '買家明細'
+                  });
                 }
               }
             });
           }
+        });
+
+        // 渲染去重後的卡片清單
+        soldCardMap.forEach((card, key) => {
+          const div = document.createElement('div');
+          div.className = 'card';
+
+          if (card.type === 'full') {
+            div.innerHTML = `
+              <img src="${card.coverImg}" class="card-img" alt="圖">
+              <div class="card-title">${card.title}</div>
+              <div class="card-sub">售價: $${card.sellPrice} (${card.platform})</div>
+              <div class="badge-container">
+                <span class="badge ${card.profit >= 0 ? 'badge-success' : 'badge-danger'}">損益: $${card.profit}</span>
+              </div>
+              <button onclick="restoreSoldItem('${card.itemId}')" style="margin-top:8px; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.75rem;">復原 (取消整組售出)</button>
+            `;
+          } else {
+            div.innerHTML = `
+              <img src="${card.coverImg}" class="card-img" alt="圖">
+              <div class="card-title">${card.title}</div>
+              <div class="card-sub">售價: $${card.sellPrice} (${card.platform})</div>
+              <div class="badge-container">
+                <span class="badge badge-success">買家: ${card.buyerInfo}</span>
+              </div>
+              <button onclick="restoreSplitSoldItem('${card.itemId}', ${card.splitIdx})" style="margin-top:8px; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.75rem;">復原 (取消分售售出)</button>
+            `;
+          }
+          container.appendChild(div);
         });
       };
     }
@@ -1728,7 +1752,25 @@
       };
     }
 
-    // --- Export Excel (包含分售成本分攤與收益精密計算) ---
+    function restoreSplitSoldItem(itemId, splitIdx) {
+      if (!confirm('是否取消這個分售項目的售出狀態，重新放回待售清單？')) return;
+      const tx = db.transaction("items", "readwrite");
+      tx.objectStore("items").get(itemId).onsuccess = (e) => {
+        const item = e.target.result;
+        if (item && item.splitData && item.splitData.items[splitIdx]) {
+          item.splitData.items[splitIdx].isSold = false;
+          item.splitData.items[splitIdx].soldData = null;
+          item.isForsale = true; // 重新設為待售
+          tx.objectStore("items").put(item);
+        }
+      };
+      tx.oncomplete = () => {
+        renderSoldArchiveList();
+        renderGrid();
+      };
+    }
+
+    // --- Export Excel ---
     function openExportModal() { openModal('modal-export'); }
 
     function toggleExportCatAll(allCb) {
@@ -1790,12 +1832,10 @@
 
           let totalCost = i.price || i.fullTotal || i.halfTotal || i.unpaidTotal || parseFloat(i.otherTotal) || 0;
 
-          // 處理分售明細展開
           if (i.splitData && i.splitData.items && i.splitData.items.length > 0) {
             const totalQty = i.splitData.totalQty || 1;
             const perItemCost = totalCost / totalQty;
 
-            // 母卡片列 (總購入成本)
             excelData.push({
               "狀態": status,
               "分類": category,
@@ -1811,7 +1851,6 @@
               "平台": i.soldData?.platform || '-'
             });
 
-            // 展開分售項目列
             i.splitData.items.forEach(si => {
               if (includeSold || !si.isSold) {
                 const sellPrice = si.isSold ? (si.soldData?.sellPrice || 0) : 0;
@@ -1834,7 +1873,6 @@
               }
             });
           } else {
-            // 一般單件卡片
             excelData.push({
               "狀態": status,
               "分類": category,
