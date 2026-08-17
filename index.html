@@ -67,27 +67,41 @@
     .breadcrumbs span { cursor: pointer; text-decoration: underline; }
 
     .container { padding: 0 16px 16px 16px; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     
-    /* 固定大小卡片與排版規格 */
+    /* 核心修改：固定雙欄寬度為均等 50%，minmax(0, 1fr) 徹底鎖死卡片大小 */
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, minmax(0, 1fr)); 
+      gap: 12px; 
+      width: 100%;
+    }
+    
     .card {
-      background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border-color);
-      padding: 10px; display: flex; flex-direction: column; position: relative;
+      background: var(--card-bg); 
+      border-radius: 14px; 
+      border: 1px solid var(--border-color);
+      padding: 12px; 
+      display: flex; 
+      flex-direction: column; 
+      position: relative;
       box-shadow: 0 4px 12px rgba(148, 180, 203, 0.08);
-      cursor: pointer; height: 210px; box-sizing: border-box; overflow: hidden;
+      cursor: pointer;
+      min-width: 0;
+      width: 100%;
+      height: 100%;
     }
     .card-folder { border-left: 4px solid var(--primary-color); }
-    .card-img { width: 100%; height: 110px; min-height: 110px; max-height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; background: var(--primary-light); display: block; }
+    .card-img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: var(--primary-light); display: block; }
     .card-no-img {
-      width: 100%; height: 110px; min-height: 110px; max-height: 110px; border-radius: 8px; margin-bottom: 6px;
+      width: 100%; height: 110px; border-radius: 8px; margin-bottom: 8px;
       background: var(--primary-light); color: var(--primary-dark);
       display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 600;
     }
-    .card-title { font-weight: 600; font-size: 0.88rem; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
-    .card-sub { font-size: 0.72rem; color: var(--text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .card-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+    .card-sub { font-size: 0.75rem; color: var(--text-sub); }
     
-    .badge-container { display: flex; flex-wrap: nowrap; gap: 4px; margin-top: auto; overflow: hidden; }
-    .badge { display: inline-block; padding: 2px 6px; background: var(--primary-light); color: var(--primary-dark); border-radius: 6px; font-size: 0.68rem; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+    .badge-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; padding-top: 4px; }
+    .badge { display: inline-block; padding: 2px 6px; background: var(--primary-light); color: var(--primary-dark); border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
     .badge-danger { background: #fde8e8; color: var(--danger-color); }
     .badge-success { background: #e8f8f0; color: var(--success-color); }
 
@@ -292,7 +306,6 @@
       </div>
       
       <form id="item-form" onsubmit="event.preventDefault();">
-        <!-- 待售標籤勾選 -->
         <div class="form-group" style="background:var(--primary-light); padding:10px; border-radius:8px;">
           <label class="checkbox-inline">
             <input type="checkbox" id="field-is-forsale" onchange="toggleForsaleFolderGroup()"> 🏷️ 加入「待售專區」
@@ -304,7 +317,6 @@
           <select id="field-forsale-folder-select" class="form-control"></select>
         </div>
 
-        <!-- 所屬資料夾選擇（樹狀呈現） -->
         <div class="form-group">
           <label>所屬資料夾 (可手動移動位置)</label>
           <select id="field-folder-select" class="form-control"></select>
@@ -418,7 +430,6 @@
             <div class="photo-uploader" id="uploader-pre-proofs"></div>
           </div>
 
-          <!-- 付款狀態選單 -->
           <div class="form-group">
             <label>6. 付款狀態選擇</label>
             <select id="field-pay-type" class="form-control" onchange="togglePaymentFlow()">
@@ -720,7 +731,7 @@
   <div class="modal" id="modal-export">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">📊 匯出單排對帳流水帳 (Excel)</div>
+        <div class="modal-title">📊 匯出收支表 (Excel)</div>
         <button class="close-btn" onclick="closeModal('modal-export')">✕</button>
       </div>
       <div class="form-group">
@@ -753,10 +764,10 @@
       </div>
       <div class="form-group">
         <label class="checkbox-inline">
-          <input type="checkbox" id="export-include-sold" checked> 包含已售出紀錄
+          <input type="checkbox" id="export-include-sold"> 包含已售出紀錄
         </label>
       </div>
-      <button class="btn-submit" onclick="executeExportXlsx()">下載單排對帳流水帳 Excel (.xlsx)</button>
+      <button class="btn-submit" onclick="executeExportXlsx()">下載原生 Excel (.xlsx) 流水帳</button>
     </div>
   </div>
 
@@ -795,7 +806,7 @@
     let currentSplitData = { totalQty: 1, keepQty: 0, items: [] };
     let selectedSplitIndicesForSell = [];
     let cachedArchiveMap = new Map();
-    let archiveDebounceTimer = null;
+    let archiveRenderTimer = null;
 
     let imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [], sellProofs: [], folderCover: [] };
 
@@ -853,7 +864,7 @@
       renderGrid();
     }
 
-    // --- Render Items & Folders (規格化固定大小卡片) ---
+    // --- Render Items & Folders ---
     function renderGrid() {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
@@ -953,7 +964,7 @@
         div.className = 'card card-folder';
         div.onclick = () => navigateToFolder(f.id, f.name);
         
-        let coverHtml = `<div class="card-no-img" style="font-size: 1.6rem; color:var(--primary-color);">📁</div>`;
+        let coverHtml = `<div style="font-size: 1.8rem; text-align:center; margin: 8px 0; color:var(--primary-color);">資料夾</div>`;
         if (f.coverPhoto) {
           coverHtml = `<img src="${f.coverPhoto}" class="card-img" alt="封面" loading="lazy">`;
         }
@@ -961,9 +972,9 @@
         div.innerHTML = `
           ${coverHtml}
           <div class="card-title">${f.name}</div>
-          <div class="card-sub" style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
-            <span>資料夾</span>
-            <button onclick="event.stopPropagation(); openFolderModal('${f.id}')" style="border:none; background:none; font-size:0.72rem; color:var(--text-sub);">編輯</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
+            <span class="card-sub">資料夾</span>
+            <button onclick="event.stopPropagation(); openFolderModal('${f.id}')" style="border:none; background:none; font-size:0.75rem; color:var(--text-sub);">編輯</button>
           </div>
         `;
         container.appendChild(div);
@@ -987,7 +998,7 @@
         let splitTag = '';
         if (item.splitData && item.splitData.items && item.splitData.items.length > 0) {
           const unsoldSplitCount = item.splitData.items.filter(si => !si.isSold).length;
-          splitTag = `<span class="badge" style="background:#8e44ad; color:white;">分售:${unsoldSplitCount}件</span>`;
+          splitTag = `<span class="badge" style="background:#8e44ad; color:white;">分售待售:${unsoldSplitCount}件</span>`;
         }
 
         const priceDisplay = item.tab === 'arrived' ? `$${item.price || 0}` : getPreorderPriceBadge(item);
@@ -1380,14 +1391,20 @@
             ${statusBadge}
           </div>
           <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-            <input type="text" class="form-control" style="padding:6px;" value="${item.name}" placeholder="自訂項目名稱" onchange="currentSplitData.items[${idx}].name=this.value" ${item.isSold?'disabled':''}>
-            <input type="number" class="form-control" style="padding:6px; width:90px;" value="${item.price||0}" placeholder="預設售價" onchange="currentSplitData.items[${idx}].price=parseFloat(this.value)||0" ${item.isSold?'disabled':''}>
+            <input type="text" class="form-control" style="padding:6px;" value="${item.name}" placeholder="自訂項目名稱" onchange="updateSplitItemName(${idx}, this.value)">
+            <input type="number" class="form-control" style="padding:6px; width:90px;" value="${item.price||0}" placeholder="預設售價" onchange="currentSplitData.items[${idx}].price=parseFloat(this.value)||0">
           </div>
         `;
         container.appendChild(div);
       });
 
       updateSplitSummaryUI();
+    }
+
+    function updateSplitItemName(idx, newName) {
+      if (currentSplitData.items[idx]) {
+        currentSplitData.items[idx].name = newName;
+      }
     }
 
     function openBatchSellModal() {
@@ -1673,17 +1690,17 @@
       };
     }
 
-    // --- Sold Archive Grid & Restore ---
+    // --- 防抖即時搜尋歸檔庫 ---
+    function debouncedRenderSoldArchiveList() {
+      clearTimeout(archiveRenderTimer);
+      archiveRenderTimer = setTimeout(() => {
+        renderSoldArchiveList();
+      }, 150);
+    }
+
     function openSoldArchiveModal() {
       renderSoldArchiveList();
       openModal('modal-sold-archive');
-    }
-
-    function debouncedRenderSoldArchiveList() {
-      if (archiveDebounceTimer) clearTimeout(archiveDebounceTimer);
-      archiveDebounceTimer = setTimeout(() => {
-        renderSoldArchiveList();
-      }, 250);
     }
 
     function renderSoldArchiveList() {
@@ -1727,7 +1744,7 @@
           if (item.splitData && item.splitData.items) {
             item.splitData.items.forEach((si, sIdx) => {
               if (si.isSold && si.soldData) {
-                const currentName = si.name || `#${sIdx+1}`;
+                const currentName = si.name;
                 const buyerStr = `${si.soldData.buyerNickname||''} ${si.soldData.buyerOrderNo||''} ${si.soldData.buyerExtra||''}`;
                 const matchKeyword = !keyword || (parentTitle + currentName + buyerStr + (si.soldData.platform||'')).toLowerCase().includes(keyword);
 
@@ -1778,6 +1795,7 @@
           }
         });
 
+        // 繪製卡片
         cachedArchiveMap.forEach((card, key) => {
           const div = document.createElement('div');
           div.className = 'card';
@@ -1798,7 +1816,7 @@
             <div class="badge-container">
               ${badgeHtml}
             </div>
-            <button onclick="event.stopPropagation(); executeArchiveRestore('${key}')" style="margin-top:auto; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.72rem;">復原 (取消售出)</button>
+            <button onclick="event.stopPropagation(); executeArchiveRestore('${key}')" style="margin-top:8px; padding:6px; border:none; background:var(--primary-light); color:var(--primary-dark); border-radius:6px; font-weight:600; font-size:0.75rem;">復原 (取消售出)</button>
           `;
           container.appendChild(div);
         });
@@ -1876,7 +1894,7 @@
       };
     }
 
-    // --- Export Excel (單排流水帳 + 時間軸正序 + 自留成本試算) ---
+    // --- Export Excel ---
     function openExportModal() { openModal('modal-export'); }
 
     function toggleExportCatAll(allCb) {
@@ -1930,95 +1948,96 @@
         let rawRows = [];
 
         items.forEach(i => {
-          const parentTitle = i.title || i.preTitle || i.category || '未命名週邊';
-          const baseDate = i.receivedDate || i.preDate || '2026-01-01';
+          const category = i.category || '';
+          const name = i.title || i.preTitle || '';
+          const baseDate = i.receivedDate || i.preDate || '';
           const totalCost = i.price || i.fullTotal || i.halfTotal || i.unpaidTotal || parseFloat(i.otherTotal) || 0;
 
-          // 處理分售（平舖扁平單排流水帳）
           if (i.splitData && i.splitData.items && i.splitData.items.length > 0) {
             const totalQty = i.splitData.totalQty || 1;
             const keepQty = i.splitData.keepQty || 0;
             const perItemCost = totalCost / totalQty;
 
-            // 1. 自留部分流水帳列
+            // 1. 自留部分列
             if (keepQty > 0) {
               const keepCost = perItemCost * keepQty;
               rawRows.push({
                 date: baseDate,
-                name: `${parentTitle} (自留 ${keepQty} 件)`,
+                name: `${name} (自留 ${keepQty} 件)`,
                 totalCost: totalCost,
                 unitCost: keepCost,
                 sellPrice: 0,
-                profitFormula: 0 - keepCost,
-                buyerNickname: '-',
-                buyerOrderNo: '-',
+                profit: -keepCost,
+                buyer: '-',
                 platform: '-'
               });
             }
 
-            // 2. 分售項目流水帳列
-            i.splitData.items.forEach((si, sIdx) => {
+            // 2. 分售各項目列
+            i.splitData.items.forEach(si => {
               if (includeSold || !si.isSold) {
-                const sellDate = si.soldData?.sellDate || baseDate;
                 const sellPrice = si.isSold ? (si.soldData?.sellPrice || 0) : 0;
+                const profit = si.isSold ? (sellPrice - perItemCost) : -perItemCost;
+                const date = (si.isSold && si.soldData?.sellDate) ? si.soldData.sellDate : baseDate;
 
                 rawRows.push({
-                  date: sellDate,
-                  name: `${parentTitle} - ${si.name||`分售#${sIdx+1}`}`,
+                  date: date,
+                  name: `${name} (${si.name})`,
                   totalCost: totalCost,
                   unitCost: perItemCost,
                   sellPrice: sellPrice,
-                  profitFormula: si.isSold ? (sellPrice - perItemCost) : (0 - perItemCost),
-                  buyerNickname: si.soldData?.buyerNickname || '-',
-                  buyerOrderNo: si.soldData?.buyerOrderNo || '-',
+                  profit: profit,
+                  buyer: si.soldData?.buyerNickname || '-',
                   platform: si.soldData?.platform || '-'
                 });
               }
             });
           } else {
-            // 一般單件商品流水帳列
+            // 一般單件商品
+            const sellPrice = i.isSold ? (i.soldData?.sellPrice || 0) : 0;
+            const profit = i.isSold ? (sellPrice - totalCost) : -totalCost;
+            const date = (i.isSold && i.soldData?.sellDate) ? i.soldData.sellDate : baseDate;
+
             rawRows.push({
-              date: baseDate,
-              name: parentTitle,
+              date: date,
+              name: name,
               totalCost: totalCost,
               unitCost: totalCost,
-              sellPrice: i.isSold ? (i.soldData?.sellPrice || 0) : 0,
-              profitFormula: i.isSold ? ((i.soldData?.sellPrice || 0) - totalCost) : (0 - totalCost),
-              buyerNickname: i.soldData?.buyerNickname || '-',
-              buyerOrderNo: i.soldData?.buyerOrderNo || '-',
+              sellPrice: sellPrice,
+              profit: profit,
+              buyer: i.soldData?.buyerNickname || '-',
               platform: i.soldData?.platform || '-'
             });
           }
         });
-
-        // 按日期由舊到新正序排列
-        rawRows.sort((a,b) => new Date(a.date) - new Date(b.date));
 
         if (rawRows.length === 0) {
           alert('當前選擇的條件下沒有資料可以匯出！');
           return;
         }
 
+        // 時間序列由舊到新正序排列
+        rawRows.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
         const excelData = rawRows.map(r => ({
           "日期": r.date,
-          "商品名稱 / 分售備註": r.name,
+          "商品名稱/分售備註": r.name,
           "進貨總成本": r.totalCost,
           "單件進貨成本": r.unitCost,
           "實際售價": r.sellPrice,
-          "單筆損益": r.profitFormula,
-          "買家暱稱": r.buyerNickname,
-          "訂單單號": r.buyerOrderNo,
-          "平台": r.platform
+          "單筆損益": r.profit,
+          "買家暱稱": r.buyer,
+          "販售平台": r.platform
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "單排對帳流水帳");
 
-        worksheet['!cols'] = [ { wch: 12 }, { wch: 28 }, { wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 18 }, { wch: 10 } ];
+        worksheet['!cols'] = [ { wch: 12 }, { wch: 28 }, { wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 10 } ];
 
         const todayStr = new Date().toISOString().split('T')[0];
-        XLSX.writeFile(workbook, `週邊們_單排對帳流水帳_${todayStr}.xlsx`);
+        XLSX.writeFile(workbook, `週邊們_單排流水帳_${todayStr}.xlsx`);
 
         closeModal('modal-export');
       };
