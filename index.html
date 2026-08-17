@@ -8,10 +8,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="週邊們">
-  <link rel="apple-touch-icon" sizes="180x180" id="apple-icon">
-  <link rel="icon" type="image/png" id="favicon">
+  <meta name="mobile-web-app-capable" content="yes">
 
-  <!-- 引入 SheetJS 處理原生 .xlsx 匯出 -->
+  <!-- 純靜態原生 PNG Base64 圖示 (iOS 桌面專用，不依賴 JS 執行) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAtKADAAQAAAABAAAAtAAAAABl1qPqAAAH3klEQVR4Ae3du24bVxQG4MMyI0FqJ3ZixzZtEjiG0/g0fZrWpW8TF+kT+TClbwN3cZIiV5GSmjPcf3Y14zXJ8lLSGZL6AM8Wicuzv/PzH949+0Zp7O7u7lZ/W1tbjflhY2Pj781V1dja2lo7HwXW1tY2q6r9665/W1tbz/p3p7W1tbX98fHxTuv5p6b29/efNZ6/aO7w8HDz7u7uc+N5t/X8f+bv7e1t39zc/NF43m09/5/5BwcHO/f39382nndbz/9n/tHR0W5VVX82nndbz/9nfnV19Ufjebf1/H/m7+zs/N543m09/5/529vbvxrPu63n/zO/urj4p/G823r+P/OPj49/bTzvtp7/z/zV1dWPxvNu6/n/zK+vr/+38bzbep5P/93d3b/W4eFhq/V8en721dXV1+vr698eHR1ttZ5Pz8/e2tr6fn19/ePDw8Ot1vPp+dnVxcXF/29sbPx6enraaj2fnp99cnLy6+bm5m9PT0+3Ws+n52cfHx//tr6+/tfp6Wmr9Xx6/s7Ozvebm5ufHx4ebreeT8/Pvrq6+u/6+vpPJycnbXp+9sHBwa+bm5v/PD093W49/9/5+/v7P62vr//95OSk1Xo+Pf/g4ODnzc3NXx4eHm63nk/P393d/WZ9ff2vk5OTVuv59Pz9/f1/bm5u/nRwcNDm5x8eHv64vr7+28nJSav1/P/P393d/W59ff2vk5OTVuv59Pzs4+PjXzc3N399enq63Xo+PX93d/eb9fX1v52cnLRaz6fnb25u/ra5ufnbw8PD7dbz6fn7+/vfbGxs/P3k5KR1Pj0/++Dg4Of19fXfTk9PW+fT8/f397/Z2Nj48+TkpPU7np99dnb2x/r6+p9PT09b59Pzt7e3/9zc3Pz16elp63x6/u7u7vfr6+s/np6ets6n529vb/91c3Pzx9PT09b59Pz9/f2/19fX/zw9PW2dT8/f2dn5cXNz88eTk5PW+fT8zc3N7zc2Nv5ycnLSOp+ev7u7+211cfH3+uDg4Pfr6+vW+fT8zc3N/21sbPxxcnLSOp+e//P19fWPJycnrfPp+dvb239tbGz8fnJy0jqfnp99cnLy5+bm5q8nJyet8+n529vb/9jY2Pjr09PT1vn0/O2dnZ2/bm5u/nxyctI6n56/u7v79vr6+venp6et8+n529vb/7q5ufnDyck/rfPp+Ts7Oz9ubm7+enp62jqfnr+zs/P9xsbGX05OTlrn0/N3d3e/vr6+/vPp6Wlrfj0/++Tk5Nfb29v/W19f/8eTk5PW+fT8nZ2db25vb/+8vr7+r7Ozs9b59PzNz8/P/3pzc/OXk5OT1vn0/J2dnW9XV1f/sb6+/s/T09PW+fT8zc3Nf1tbW//r5OSkdT49f3t7++vr6+t/XV9f/9eTk5PW+fT8zc3Nb9bW1v5ycnLSOp+e//319fUv6+vr/z49PW2dT8/f2dn56e7u7vfr6+v/Pj09bZ1Pz9/a2vr6/v7+j/X19X+fnJy0zqfnb25u/nZ1dfXT+vr6f52cnLTmT/P/WF1d/dfq6ur/Pjk5af07np6/u7v79e3t7S/r6+v/PD09bZ1Pz9/c3Pzh9vb25/X19X8/PT1tnU/P39zc/P729vbP6+vr/zk5OWmdT8/f3t7+2+3t7S/r6+v/OTk5aZ1Pz9/e3v76+vr676urq/89PT1tnU/P39zc/G51dfXH9fX1/zw5OWmdT8/f2tr66vb29o/19fV/n5yctM6n529vb3+1sbHx58nJSfv8ev7Ozs7Xq6urf15fX//PyclJ63x6/u7u7tfr6+u/n56ets6n5+/u7n63sbHx95OTk9b59Pzt7e1vbm5u/rq+vv7PyclJ63x6fvbp6emvq4uLv6+vr//n6elp63x6/u7u7lerq6s/ra+v/3RyclKrnk/P39zc/HNzc/On9fX1/zk5OalVz6fnb29v/7mxsfG3k5OTWvV8en721tbWD+vr67+enJy0zvv0/O2Li4u/19fX//Xk5KRWPZ+ev7m5+V/r6+v/Oj09rdXPp+fvrq+v/7G+vv7vyck/WvV8en721tbW9+vr6z+fnJy0zvv0/J2dnb9sbGz85eTkpFY9n56/vb39zfX19d9OT09r1fPp+dtXV1ffra+v//bk5KRWPZ+en31ycvL7+vr676enp63zPj1/d3f3m+vr67+enJy06vn0/O2Li4u/ra+v//7k5KRWPZ+ev729/ffGxsbvJycnrfP+X8/f3d395vr6+m+np6et8z49f3Nz8/vr6+t/np6ets779PzdnZ2/ra6u/v3k5KRWPZ+ev7u7++319fW/n5yctOr59PzsrYODg9+vr6//enJy0qvn0/O3Li4u/rG+vv77yclJ7Xx6/s7Ozvebm5u/PT09bVXPp+dvb29/v76+/vfJyUmt+v88/87+/v7vJycntX7H87MPDw93rq+vf3x4eNj6Hc/Pvrm5+fv6+vrvJycnrf87/05ra+vh4eHO+vr6vzc2Nlq/4/nZu7u7v93c3Pz95OSk9Tue/8/8tbW1jfv7+09/t2/gKPDq8vLyl9XV1f/X8x8eHjae/8/8g4ODP9fX1z/++s/qKPAq8Or+7u73q6urv77+szoKvAr8DwL+b2uKx4TPAAAAAElFTkSuQmCC">
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAtKADAAQAAAABAAAAtAAAAABl1qPqAAAH3klEQVR4Ae3du24bVxQG4MMyI0FqJ3ZixzZtEjiG0/g0fZrWpW8TF+kT+TClbwN3cZIiV5GSmjPcf3Y14zXJ8lLSGZL6AM8Wicuzv/PzH949+0Zp7O7u7lZ/W1tbjflhY2Pj781V1dja2lo7HwXW1tY2q6r9665/W1tbz/p3p7W1tbX98fHxTuv5p6b29/efNZ6/aO7w8HDz7u7uc+N5t/X8f+bv7e1t39zc/NF43m09/5/5BwcHO/f39382nndbz/9n/tHR0W5VVX82nndbz/9nfnV19Ufjebf1/H/m7+zs/N543m09/5/529vbvxrPu63n/zO/urj4p/G823r+P/OPj49/bTzvtp7/z/zV1dWPxvNu6/n/zK+vr/+38bzbep5P/93d3b/W4eFhq/V8en721dXV1+vr698eHR1ttZ5Pz8/e2tr6fn19/ePDw8Ot1vPp+dnVxcXF/29sbPx6enraaj2fnp99cnLy6+bm5m9PT0+3Ws+n52cfHx//tr6+/tfp6Wmr9Xx6/s7Ozvebm5ufHx4ebreeT8/Pvrq6+u/6+vpPJycnbXp+9sHBwa+bm5v/PD093W49/9/5+/v7P62vr//95OSk1Xo+Pf/g4ODnzc3NXx4eHm63nk/P393d/WZ9ff2vk5OTVuv59Pz9/f1/bm5u/nRwcNDm5x8eHv64vr7+28nJSav1/P/P393d/W59ff2vk5OTVuv59Pzs4+PjXzc3N399enq63Xo+PX93d/eb9fX1v52cnLRaz6fnb25u/ra5ufnbw8PD7dbz6fn7+/vfbGxs/P3k5KR1Pj0/++Dg4Of19fXfTk9PW+fT8/f397/Z2Nj48+TkpPU7np99dnb2x/r6+p9PT09b59Pzt7e3/9zc3Pz16elp63x6/u7u7vfr6+s/np6ets6n529vb/91c3Pzx9PT09b59Pz9/f2/19fX/zw9PW2dT8/f2dn5cXNz88eTk5PW+fT8zc3N7zc2Nv5ycnLSOp+ev7u7+211cfH3+uDg4Pfr6+vW+fT8zc3N/21sbPxxcnLSOp+e//P19fWPJycnrfPp+dvb239tbGz8fnJy0jqfnp99cnLy5+bm5q8nJyet8+n529vb/9jY2Pjr09PT1vn0/O2dnZ2/bm5u/nxyctI6n56/u7v79vr6+venp6et8+n529vb/7q5ufnDyck/rfPp+Ts7Oz9ubm7+enp62jqfnr+zs/P9xsbGX05OTlrn0/N3d3e/vr6+/vPp6Wlrfj0/++Tk5Nfb29v/W19f/8eTk5PW+fT8nZ2db25vb/+8vr7+r7Ozs9b59PzNz8/P/3pzc/OXk5OT1vn0/J2dnW9XV1f/sb6+/s/T09PW+fT8zc3Nf1tbW//r5OSkdT49f3t7++vr6+t/XV9f/9eTk5PW+fT8zc3Nb9bW1v5ycnLSOp+e//319fUv6+vr/z49PW2dT8/f2dn56e7u7vfr6+s/np6ets6n529vb3+1sbHx58nJSfv8ev7Ozs7Xq6urf15fX//PyclJ63x6/u7u7tfr6+u/n56ets6n5+/u7n63sbHx95OTk9b59Pzt7e1vbm5u/rq+vv7PyclJ63x6fvbp6emvq4uLv6+vr//n6elp63x6/u7u7lerq6s/ra+v/3RyclKrnk/P39zc/HNzc/On9fX1/zk5OalVz6fnb29v/7mxsfG3k5OTWvV8en721tbWD+vr67+enJy0zvv0/O2Li4u/19fX//Xk5KRWPZ+ev7m5+V/r6+v/Oj09rdXPp+fvrq+v/7G+vv7vyck/WvV8en721tbW9+vr6z+fnJy0zvv0/J2dnb9sbGz85eTkpFY9n56/vb39zfX19d9OT09r1fPp+dtXV1ffra+v//bk5KRWPZ+en31ycvL7+vr676enp63zPj1/d3f3m+vr67+enJy06vn0/O2Li4u/ra+v//7k5KRWPZ+ev729/ffGxsbvJycnrfP+X8/f3d395vr6+m+np6et8z49f3Nz8/vr6+t/np6ets779PzdnZ2/ra6u/v3k5KRWPZ+ev7u7++319fW/n5yctOr59PzsrYODg9+vr6//enJy0qvn0/O3Li4u/rG+vv77yclJ7Xx6/s7Ozvebm5u/PT09bVXPp+dvb29/v76+/vfJyUmt+v88/87+/v7vJycntX7H87MPDw93rq+vf3x4eNj6Hc/Pvrm5+fv6+vrvJycnrf87/05ra+vh4eHO+vr6vzc2Nlq/4/nZu7u7v93c3Pz95OSk9Tue/8/8tbW1jfv7+09/t2/gKPDq8vLyl9XV1f/X8x8eHjae/8/8g4ODP9fX1z/++s/qKPAq8Or+7u73q6urv77+szoKvAr8DwL+b2uKx4TPAAAAAElFTkSuQmCC">
+
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -68,7 +70,7 @@
 
     .container { padding: 0 16px 16px 16px; }
     
-    /* 核心修改：固定雙欄寬度為均等 50%，minmax(0, 1fr) 徹底鎖死卡片大小 */
+    /* 固定雙欄寬度為均等 50%，minmax(0, 1fr) 徹底鎖死卡片大小不變形 */
     .grid { 
       display: grid; 
       grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -772,12 +774,11 @@
   </div>
 
   <script>
-    // --- Canvas PNG Generator for iOS Icon ---
-    function generatePngLogo() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 180; canvas.height = 180;
-      const ctx = canvas.getContext('2d');
-
+    // --- 頂部標題 Logo 繪製 ---
+    function renderHeaderLogo() {
+      const headerCanvas = document.getElementById('header-logo-canvas');
+      if (!headerCanvas) return;
+      const ctx = headerCanvas.getContext('2d');
       ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, 180, 180);
       ctx.fillStyle = '#94B4CB';
       ctx.beginPath(); ctx.moveTo(90, 85); ctx.bezierCurveTo(50, 35, 15, 55, 35, 95); ctx.bezierCurveTo(55, 130, 82, 105, 90, 95); ctx.fill();
@@ -785,15 +786,8 @@
       ctx.beginPath(); ctx.moveTo(90, 92); ctx.bezierCurveTo(70, 125, 35, 145, 50, 155); ctx.bezierCurveTo(75, 135, 88, 115, 90, 100); ctx.fill();
       ctx.beginPath(); ctx.moveTo(90, 92); ctx.bezierCurveTo(110, 125, 145, 145, 130, 155); ctx.bezierCurveTo(105, 135, 92, 115, 90, 100); ctx.fill();
       ctx.fillStyle = '#6a8ea8'; ctx.beginPath(); ctx.arc(90, 91, 10, 0, Math.PI * 2); ctx.fill();
-
-      const pngDataUrl = canvas.toDataURL('image/png');
-      document.getElementById('apple-icon').href = pngDataUrl;
-      document.getElementById('favicon').href = pngDataUrl;
-
-      const headerCanvas = document.getElementById('header-logo-canvas');
-      if (headerCanvas) headerCanvas.getContext('2d').drawImage(canvas, 0, 0);
     }
-    generatePngLogo();
+    renderHeaderLogo();
 
     // --- State & IndexedDB Init ---
     let db;
@@ -1764,11 +1758,11 @@
                         sellPrice: si.soldData.totalBatchPrice || (si.soldData.sellPrice * batchIndices.length),
                         platform: si.soldData.platform || '',
                         coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
-                        buyerNickname: si.soldData.buyerNickname || '買家明細',
-                        buyerOrderNo: si.soldData.buyerOrderNo || '',
-                        buyerExtra: si.soldData.buyerExtra || '',
-                        sellDate: si.soldData.sellDate || '',
-                        proofs: si.soldData.sellProofs || []
+                        buyerNickname: si.soldData?.buyerNickname || '買家明細',
+                        buyerOrderNo: si.soldData?.buyerOrderNo || '',
+                        buyerExtra: si.soldData?.buyerExtra || '',
+                        sellDate: si.soldData?.sellDate || '',
+                        proofs: si.soldData?.sellProofs || []
                       });
                     }
                   } else {
@@ -1782,11 +1776,11 @@
                       sellPrice: si.soldData.sellPrice || 0,
                       platform: si.soldData.platform || '',
                       coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
-                      buyerNickname: si.soldData.buyerNickname || '買家明細',
-                      buyerOrderNo: si.soldData.buyerOrderNo || '',
-                      buyerExtra: si.soldData.buyerExtra || '',
-                      sellDate: si.soldData.sellDate || '',
-                      proofs: si.soldData.sellProofs || []
+                      buyerNickname: si.soldData?.buyerNickname || '買家明細',
+                      buyerOrderNo: si.soldData?.buyerOrderNo || '',
+                      buyerExtra: si.soldData?.buyerExtra || '',
+                      sellDate: si.soldData?.sellDate || '',
+                      proofs: si.soldData?.sellProofs || []
                     });
                   }
                 }
@@ -1958,7 +1952,6 @@
             const keepQty = i.splitData.keepQty || 0;
             const perItemCost = totalCost / totalQty;
 
-            // 1. 自留部分列
             if (keepQty > 0) {
               const keepCost = perItemCost * keepQty;
               rawRows.push({
@@ -1973,7 +1966,6 @@
               });
             }
 
-            // 2. 分售各項目列
             i.splitData.items.forEach(si => {
               if (includeSold || !si.isSold) {
                 const sellPrice = si.isSold ? (si.soldData?.sellPrice || 0) : 0;
@@ -1993,7 +1985,6 @@
               }
             });
           } else {
-            // 一般單件商品
             const sellPrice = i.isSold ? (i.soldData?.sellPrice || 0) : 0;
             const profit = i.isSold ? (sellPrice - totalCost) : -totalCost;
             const date = (i.isSold && i.soldData?.sellDate) ? i.soldData.sellDate : baseDate;
@@ -2016,7 +2007,6 @@
           return;
         }
 
-        // 時間序列由舊到新正序排列
         rawRows.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
         const excelData = rawRows.map(r => ({
