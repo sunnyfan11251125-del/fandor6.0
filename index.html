@@ -8,14 +8,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="週邊們">
-  <meta name="mobile-web-app-capable" content="yes">
-
-  <!-- 純靜態原生 PNG Base64 圖示 (iOS 桌面專用，不依賴 JS 執行) -->
-  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAtKADAAQAAAABAAAAtAAAAABl1qPqAAAH3klEQVR4Ae3du24bVxQG4MMyI0FqJ3ZixzZtEjiG0/g0fZrWpW8TF+kT+TClbwN3cZIiV5GSmjPcf3Y14zXJ8lLSGZL6AM8Wicuzv/PzH949+0Zp7O7u7lZ/W1tbjflhY2Pj781V1dja2lo7HwXW1tY2q6r9665/W1tbz/p3p7W1tbX98fHxTuv5p6b29/efNZ6/aO7w8HDz7u7uc+N5t/X8f+bv7e1t39zc/NF43m09/5/5BwcHO/f39382nndbz/9n/tHR0W5VVX82nndbz/9nfnV19Ufjebf1/H/m7+zs/N543m09/5/529vbvxrPu63n/zO/urj4p/G823r+P/OPj49/bTzvtp7/z/zV1dWPxvNu6/n/zK+vr/+38bzbep5P/93d3b/W4eFhq/V8en721dXV1+vr698eHR1ttZ5Pz8/e2tr6fn19/ePDw8Ot1vPp+dnVxcXF/29sbPx6enraaj2fnp99cnLy6+bm5m9PT0+3Ws+n52cfHx//tr6+/tfp6Wmr9Xx6/s7Ozvebm5ufHx4ebreeT8/Pvrq6+u/6+vpPJycnbXp+9sHBwa+bm5v/PD093W49/9/5+/v7P62vr//95OSk1Xo+Pf/g4ODnzc3NXx4eHm63nk/P393d/WZ9ff2vk5OTVuv59Pz9/f1/bm5u/nRwcNDm5x8eHv64vr7+28nJSav1/P/P393d/W59ff2vk5OTVuv59Pzs4+PjXzc3N399enq63Xo+PX93d/eb9fX1v52cnLRaz6fnb25u/ra5ufnbw8PD7dbz6fn7+/vfbGxs/P3k5KR1Pj0/++Dg4Of19fXfTk9PW+fT8/f397/Z2Nj48+TkpPU7np99dnb2x/r6+p9PT09b59Pzt7e3/9zc3Pz16elp63x6/u7u7vfr6+s/np6ets6n529vb/91c3Pzx9PT09b59Pz9/f2/19fX/zw9PW2dT8/f2dn5cXNz88eTk5PW+fT8zc3N7zc2Nv5ycnLSOp+ev7u7+211cfH3+uDg4Pfr6+vW+fT8zc3N/21sbPxxcnLSOp+e//P19fWPJycnrfPp+dvb239tbGz8fnJy0jqfnp99cnLy5+bm5q8nJyet8+n529vb/9jY2Pjr09PT1vn0/O2dnZ2/bm5u/nxyctI6n56/u7v79vr6+venp6et8+n529vb/7q5ufnDyck/rfPp+Ts7Oz9ubm7+enp62jqfnr+zs/P9xsbGX05OTlrn0/N3d3e/vr6+/vPp6Wlrfj0/++Tk5Nfb29v/W19f/8eTk5PW+fT8nZ2db25vb/+8vr7+r7Ozs9b59PzNz8/P/3pzc/OXk5OT1vn0/J2dnW9XV1f/sb6+/s/T09PW+fT8zc3Nf1tbW//r5OSkdT49f3t7++vr6+t/XV9f/9eTk5PW+fT8zc3Nb9bW1v5ycnLSOp+e//319fUv6+vr/z49PW2dT8/f2dn56e7u7vfr6+v/Pj09bZ1Pz9/a2vr6/v7+j/X19X+fnJy0zqfnb25u/nZ1dfXT+vr6f52cnLTmT/P/WF1d/dfq6ur/Pjk5af07np6/u7v79e3t7S/r6+v/PD09bZ1Pz9/c3Pzh9vb25/X19X8/PT1tnU/P39zc/P729vbP6+vr/zk5OWmdT8/f3t7+2+3t7S/r6+v/OTk5aZ1Pz9/e3v76+vr676urq/89PT1tnU/P39zc/G51dfXH9fX1/zw5OWmdT8/f2tr66vb29o/19fV/n5yctM6n529vb3+1sbHx58nJSfv8ev7Ozs7Xq6urf15fX//PyclJ63x6/u7u7tfr6+u/n56ets6n5+/u7n63sbHx95OTk9b59Pzt7e1vbm5u/rq+vv7PyclJ63x6fvbp6emvq4uLv6+vr//n6elp63x6/u7u7lerq6s/ra+v/3RyclKrnk/P39zc/HNzc/On9fX1/zk5OalVz6fnb29v/7mxsfG3k5OTWvV8en721tbWD+vr67+enJy0zvv0/O2Li4u/19fX//Xk5KRWPZ+ev7m5+V/r6+v/Oj09rdXPp+fvrq+v/7G+vv7vyck/WvV8en721tbW9+vr6z+fnJy0zvv0/J2dnb9sbGz85eTkpFY9n56/vb39zfX19d9OT09r1fPp+dtXV1ffra+v//bk5KRWPZ+en31ycvL7+vr676enp63zPj1/d3f3m+vr67+enJy06vn0/O2Li4u/ra+v//7k5KRWPZ+ev729/ffGxsbvJycnrfP+X8/f3d395vr6+m+np6et8z49f3Nz8/vr6+t/np6ets779PzdnZ2/ra6u/v3k5KRWPZ+ev7u7++319fW/n5yctOr59PzsrYODg9+vr6//enJy0qvn0/O3Li4u/rG+vv77yclJ7Xx6/s7Ozvebm5u/PT09bVXPp+dvb29/v76+/vfJyUmt+v88/87+/v7vJycntX7H87MPDw93rq+vf3x4eNj6Hc/Pvrm5+fv6+vrvJycnrf87/05ra+vh4eHO+vr6vzc2Nlq/4/nZu7u7v93c3Pz95OSk9Tue/8/8tbW1jfv7+09/t2/gKPDq8vLyl9XV1f/X8x8eHjae/8/8g4ODP9fX1z/++s/qKPAq8Or+7u73q6urv77+szoKvAr8DwL+b2uKx4TPAAAAAElFTkSuQmCC">
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAtKADAAQAAAABAAAAtAAAAABl1qPqAAAH3klEQVR4Ae3du24bVxQG4MMyI0FqJ3ZixzZtEjiG0/g0fZrWpW8TF+kT+TClbwN3cZIiV5GSmjPcf3Y14zXJ8lLSGZL6AM8Wicuzv/PzH949+0Zp7O7u7lZ/W1tbjflhY2Pj781V1dja2lo7HwXW1tY2q6r9665/W1tbz/p3p7W1tbX98fHxTuv5p6b29/efNZ6/aO7w8HDz7u7uc+N5t/X8f+bv7e1t39zc/NF43m09/5/5BwcHO/f39382nndbz/9n/tHR0W5VVX82nndbz/9nfnV19Ufjebf1/H/m7+zs/N543m09/5/529vbvxrPu63n/zO/urj4p/G823r+P/OPj49/bTzvtp7/z/zV1dWPxvNu6/n/zK+vr/+38bzbep5P/93d3b/W4eFhq/V8en721dXV1+vr698eHR1ttZ5Pz8/e2tr6fn19/ePDw8Ot1vPp+dnVxcXF/29sbPx6enraaj2fnp99cnLy6+bm5m9PT0+3Ws+n52cfHx//tr6+/tfp6Wmr9Xx6/s7Ozvebm5ufHx4ebreeT8/Pvrq6+u/6+vpPJycnbXp+9sHBwa+bm5v/PD093W49/9/5+/v7P62vr//95OSk1Xo+Pf/g4ODnzc3NXx4eHm63nk/P393d/WZ9ff2vk5OTVuv59Pz9/f1/bm5u/nRwcNDm5x8eHv64vr7+28nJSav1/P/P393d/W59ff2vk5OTVuv59Pzs4+PjXzc3N399enq63Xo+PX93d/eb9fX1v52cnLRaz6fnb25u/ra5ufnbw8PD7dbz6fn7+/vfbGxs/P3k5KR1Pj0/++Dg4Of19fXfTk9PW+fT8/f397/Z2Nj48+TkpPU7np99dnb2x/r6+p9PT09b59Pzt7e3/9zc3Pz16elp63x6/u7u7vfr6+s/np6ets6n529vb/91c3Pzx9PT09b59Pz9/f2/19fX/zw9PW2dT8/f2dn5cXNz88eTk5PW+fT8zc3N7zc2Nv5ycnLSOp+ev7u7+211cfH3+uDg4Pfr6+vW+fT8zc3N/21sbPxxcnLSOp+e//P19fWPJycnrfPp+dvb239tbGz8fnJy0jqfnp99cnLy5+bm5q8nJyet8+n529vb/9jY2Pjr09PT1vn0/O2dnZ2/bm5u/nxyctI6n56/u7v79vr6+venp6et8+n529vb/7q5ufnDyck/rfPp+Ts7Oz9ubm7+enp62jqfnr+zs/P9xsbGX05OTlrn0/N3d3e/vr6+/vPp6Wlrfj0/++Tk5Nfb29v/W19f/8eTk5PW+fT8nZ2db25vb/+8vr7+r7Ozs9b59PzNz8/P/3pzc/OXk5OT1vn0/J2dnW9XV1f/sb6+/s/T09PW+fT8zc3Nf1tbW//r5OSkdT49f3t7++vr6+t/XV9f/9eTk5PW+fT8zc3Nb9bW1v5ycnLSOp+e//319fUv6+vr/z49PW2dT8/f2dn56e7u7vfr6+s/np6ets6n529vb3+1sbHx58nJSfv8ev7Ozs7Xq6urf15fX//PyclJ63x6/u7u7tfr6+u/n56ets6n5+/u7n63sbHx95OTk9b59Pzt7e1vbm5u/rq+vv7PyclJ63x6fvbp6emvq4uLv6+vr//n6elp63x6/u7u7lerq6s/ra+v/3RyclKrnk/P39zc/HNzc/On9fX1/zk5OalVz6fnb29v/7mxsfG3k5OTWvV8en721tbWD+vr67+enJy0zvv0/O2Li4u/19fX//Xk5KRWPZ+ev7m5+V/r6+v/Oj09rdXPp+fvrq+v/7G+vv7vyck/WvV8en721tbW9+vr6z+fnJy0zvv0/J2dnb9sbGz85eTkpFY9n56/vb39zfX19d9OT09r1fPp+dtXV1ffra+v//bk5KRWPZ+en31ycvL7+vr676enp63zPj1/d3f3m+vr67+enJy06vn0/O2Li4u/ra+v//7k5KRWPZ+ev729/ffGxsbvJycnrfP+X8/f3d395vr6+m+np6et8z49f3Nz8/vr6+t/np6ets779PzdnZ2/ra6u/v3k5KRWPZ+ev7u7++319fW/n5yctOr59PzsrYODg9+vr6//enJy0qvn0/O3Li4u/rG+vv77yclJ7Xx6/s7Ozvebm5u/PT09bVXPp+dvb29/v76+/vfJyUmt+v88/87+/v7vJycntX7H87MPDw93rq+vf3x4eNj6Hc/Pvrm5+fv6+vrvJycnrf87/05ra+vh4eHO+vr6vzc2Nlq/4/nZu7u7v93c3Pz95OSk9Tue/8/8tbW1jfv7+09/t2/gKPDq8vLyl9XV1f/X8x8eHjae/8/8g4ODP9fX1z/++s/qKPAq8Or+7u73q6urv77+szoKvAr8DwL+b2uKx4TPAAAAAElFTkSuQmCC">
-
+  <link rel="apple-touch-icon" sizes="180x180" id="apple-icon">
+  <link rel="icon" type="image/png" id="favicon">
+  <!-- 引入 SheetJS 處理原生 .xlsx 匯出 -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
   <style>
     :root {
       --primary-color: #94B4CB;
@@ -29,10 +25,8 @@
       --danger-color: #e74c3c;
       --success-color: #2ecc71;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 90px; }
-
     header {
       background: var(--card-bg);
       position: sticky; top: 0; z-index: 100;
@@ -46,7 +40,6 @@
     .header-logo-box canvas { width: 100%; height: 100%; }
     .header-title { font-size: 1.15rem; font-weight: 700; color: var(--primary-dark); }
     .settings-btn { border: none; background: none; font-size: 1.2rem; cursor: pointer; color: var(--primary-dark); }
-
     .tabs { display: flex; background: var(--primary-light); border-radius: 12px; padding: 3px; margin: 10px 16px 0 16px; }
     .tab-btn {
       flex: 1; border: none; background: transparent; padding: 8px 0;
@@ -54,7 +47,6 @@
       border-radius: 9px; cursor: pointer; transition: all 0.2s ease;
     }
     .tab-btn.active { background: var(--card-bg); color: var(--primary-dark); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-
     .search-bar-box { padding: 10px 16px 0 16px; display: flex; flex-direction: column; gap: 8px; }
     .search-top-row { display: flex; gap: 8px; }
     .search-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.85rem; outline: none; }
@@ -63,14 +55,12 @@
     .date-filter-row { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-sub); }
     .date-input { flex: 1; padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.75rem; background: #fff; outline: none; }
     .btn-clear-date { border: none; background: var(--primary-light); color: var(--primary-dark); padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
-
     .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; font-size: 0.85rem; }
     .breadcrumbs { color: var(--primary-dark); font-weight: 600; overflow-x: auto; white-space: nowrap; }
     .breadcrumbs span { cursor: pointer; text-decoration: underline; }
-
     .container { padding: 0 16px 16px 16px; }
-    
-    /* 固定雙欄寬度為均等 50%，minmax(0, 1fr) 徹底鎖死卡片大小不變形 */
+
+    /* 鎖定固定大小樣式修改區塊 */
     .grid { 
       display: grid; 
       grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -79,13 +69,8 @@
     }
     
     .card {
-      background: var(--card-bg); 
-      border-radius: 14px; 
-      border: 1px solid var(--border-color);
-      padding: 12px; 
-      display: flex; 
-      flex-direction: column; 
-      position: relative;
+      background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border-color);
+      padding: 12px; display: flex; flex-direction: column; position: relative;
       box-shadow: 0 4px 12px rgba(148, 180, 203, 0.08);
       cursor: pointer;
       min-width: 0;
@@ -106,6 +91,7 @@
     .badge { display: inline-block; padding: 2px 6px; background: var(--primary-light); color: var(--primary-dark); border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
     .badge-danger { background: #fde8e8; color: var(--danger-color); }
     .badge-success { background: #e8f8f0; color: var(--success-color); }
+    /* -------------------------- */
 
     .fab-bar {
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -119,18 +105,15 @@
       cursor: pointer;
     }
     .fab-btn.secondary { background: var(--primary-light); color: var(--primary-dark); }
-
     .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
     .modal.active { display: flex; }
     .modal-content {
       background: var(--card-bg); width: 100%; max-height: 88vh; border-radius: 20px 20px 0 0;
       padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
-
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
     .modal-title { font-weight: 700; color: var(--primary-dark); }
     .close-btn { border: none; background: none; font-size: 1.2rem; color: var(--text-sub); cursor: pointer; }
-
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
     .form-control {
@@ -139,7 +122,6 @@
     }
     .form-control:focus { border-color: var(--primary-color); }
     textarea.form-control { resize: vertical; min-height: 60px; }
-
     .photo-uploader { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
     .photo-preview { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); }
     .photo-add-btn {
@@ -147,17 +129,14 @@
       display: flex; justify-content: center; align-items: center; color: var(--primary-color);
       font-size: 1.2rem; cursor: pointer; background: var(--primary-light);
     }
-
     .btn-submit { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
     .btn-transfer { width: 100%; padding: 12px; background: var(--success-color); color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
     .btn-split { width: 100%; padding: 12px; background: #8e44ad; color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
     .btn-sell { width: 100%; padding: 12px; background: #f39c12; color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; margin-top: 10px; cursor: pointer; }
     .btn-delete { width: 100%; padding: 10px; background: transparent; color: var(--danger-color); border: none; font-size: 0.85rem; margin-top: 5px; cursor: pointer; }
-
     .calc-box { background: var(--primary-light); padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; color: var(--primary-dark); font-weight: 600; }
     .other-input-block { margin-top: 6px; display: none; }
     .checkbox-inline { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); }
-
     .checkbox-group-box {
       background: var(--primary-light);
       padding: 10px;
@@ -175,7 +154,6 @@
       font-size: 0.85rem;
       cursor: pointer;
     }
-
     .split-item-card {
       background: #fdfefe;
       border: 1px solid var(--border-color);
@@ -205,7 +183,6 @@
   </style>
 </head>
 <body>
-
   <!-- Header -->
   <header>
     <div class="header-title-box">
@@ -216,14 +193,12 @@
     </div>
     <button class="settings-btn" onclick="openModal('modal-settings')">⚙️</button>
   </header>
-
   <!-- Tabs -->
   <div class="tabs">
     <button class="tab-btn active" id="tab-arrived" onclick="switchTab('arrived')">在家/已到貨</button>
     <button class="tab-btn" id="tab-preorder" onclick="switchTab('preorder')">預購（未到貨）</button>
     <button class="tab-btn" id="tab-forsale" onclick="switchTab('forsale')">待售專區</button>
   </div>
-
   <!-- Search, Sort & Date Filter -->
   <div class="search-bar-box">
     <div class="search-top-row">
@@ -243,24 +218,20 @@
       <button class="btn-clear-date" onclick="clearDateFilter()">✕ 清除</button>
     </div>
   </div>
-
   <!-- Breadcrumbs Nav -->
   <div class="nav-bar">
     <div class="breadcrumbs" id="breadcrumbs">路徑: <span>主目錄</span></div>
   </div>
-
   <!-- Main Container -->
   <div class="container">
     <div class="grid" id="grid-container"></div>
   </div>
-
   <!-- FAB -->
   <div class="fab-bar">
     <button class="fab-btn secondary" onclick="openFolderModal()">新增資料夾</button>
     <button class="fab-btn" onclick="openItemModal()">新增品項</button>
     <button class="fab-btn secondary" onclick="openExportModal()">📊 匯出 Excel</button>
   </div>
-
   <!-- Settings Modal -->
   <div class="modal" id="modal-settings">
     <div class="modal-content">
@@ -274,7 +245,6 @@
       <button class="btn-submit" style="background:#7f8c8d; margin-top:8px;" onclick="restoreData()">🔄 還原資料 (JSON)</button>
     </div>
   </div>
-
   <!-- Folder Modal -->
   <div class="modal" id="modal-folder">
     <div class="modal-content">
@@ -298,7 +268,6 @@
       <button class="btn-delete" id="btn-delete-folder" style="display:none;" onclick="deleteCurrentFolder()">刪除資料夾</button>
     </div>
   </div>
-
   <!-- Item Modal -->
   <div class="modal" id="modal-item">
     <div class="modal-content">
@@ -308,22 +277,21 @@
       </div>
       
       <form id="item-form" onsubmit="event.preventDefault();">
+        <!-- 待售標籤勾選 -->
         <div class="form-group" style="background:var(--primary-light); padding:10px; border-radius:8px;">
           <label class="checkbox-inline">
             <input type="checkbox" id="field-is-forsale" onchange="toggleForsaleFolderGroup()"> 🏷️ 加入「待售專區」
           </label>
         </div>
-
         <div class="form-group" id="group-forsale-folder" style="display:none;">
           <label>待售區專屬分類/資料夾</label>
           <select id="field-forsale-folder-select" class="form-control"></select>
         </div>
-
+        <!-- 所屬資料夾選擇（樹狀呈現） -->
         <div class="form-group">
           <label>所屬資料夾 (可手動移動位置)</label>
           <select id="field-folder-select" class="form-control"></select>
         </div>
-
         <div class="form-group">
           <label>1. 分類</label>
           <select id="field-category" class="form-control" onchange="toggleAlbumFields()">
@@ -338,7 +306,6 @@
             <option value="其他">其他</option>
           </select>
         </div>
-
         <div class="form-group">
           <label id="label-item-type">2. 品項</label>
           <select id="field-item-type" class="form-control">
@@ -356,7 +323,6 @@
             <option value="其他">其他</option>
           </select>
         </div>
-
         <!-- 通用分售設定區塊 -->
         <div class="form-group" style="background:#f4f6f9; padding:12px; border-radius:10px; border:1px solid var(--border-color);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -367,7 +333,6 @@
             無分售項目 (預設單件商品)
           </div>
         </div>
-
         <!-- Part (一): 在家/已到貨 欄位 -->
         <div id="section-arrived-fields">
           <div class="form-group">
@@ -390,7 +355,6 @@
             <label>6. 購買證明</label>
             <div class="photo-uploader" id="uploader-proofs"></div>
           </div>
-
           <!-- 專輯內容物 -->
           <div class="form-group" id="group-album-contents" style="display:none; background:#f0f7fc; padding:10px; border-radius:8px;">
             <label style="color:var(--primary-dark)">7. 專輯內容物</label>
@@ -398,7 +362,6 @@
             <label style="margin-top:6px;">內容物照片：</label>
             <div class="photo-uploader" id="uploader-album"></div>
           </div>
-
           <div class="form-group">
             <label>8. 其他說明</label>
             <textarea id="field-notes" class="form-control" placeholder="備註..."></textarea>
@@ -408,7 +371,6 @@
             <textarea id="field-info" class="form-control" placeholder="轉移資訊或備註..."></textarea>
           </div>
         </div>
-
         <!-- Part (二): 預購（未到貨） 欄位 -->
         <div id="section-preorder-fields" style="display:none;">
           <div class="form-group">
@@ -431,7 +393,7 @@
             <label>購買證明 (照片)</label>
             <div class="photo-uploader" id="uploader-pre-proofs"></div>
           </div>
-
+          <!-- 付款狀態選單 -->
           <div class="form-group">
             <label>6. 付款狀態選擇</label>
             <select id="field-pay-type" class="form-control" onchange="togglePaymentFlow()">
@@ -441,7 +403,6 @@
               <option value="其他">其他</option>
             </select>
           </div>
-
           <!-- 分支 1: 全付 -->
           <div id="flow-full" class="flow-block">
             <div class="form-group">
@@ -479,7 +440,6 @@
               <textarea id="pre-full-notes" class="form-control" placeholder="備註..."></textarea>
             </div>
           </div>
-
           <!-- 分支 2: 付一半（訂金） -->
           <div id="flow-half" class="flow-block" style="display:none;">
             <div class="form-group">
@@ -533,7 +493,6 @@
               <textarea id="pre-half-notes" class="form-control" placeholder="備註..."></textarea>
             </div>
           </div>
-
           <!-- 分支 3: 未付 -->
           <div id="flow-unpaid" class="flow-block" style="display:none;">
             <div class="form-group">
@@ -571,7 +530,6 @@
               <textarea id="pre-unpaid-notes" class="form-control" placeholder="備註..."></textarea>
             </div>
           </div>
-
           <!-- 分支 4: 其他 -->
           <div id="flow-other" class="flow-block" style="display:none;">
             <div class="form-group">
@@ -592,7 +550,6 @@
             </div>
           </div>
         </div>
-
         <!-- 按鈕群組 -->
         <button type="button" class="btn-submit" onclick="saveItem()">儲存此品項</button>
         <button type="button" id="btn-transfer-action" class="btn-transfer" style="display:none;" onclick="openTransferModal()">已到貨，轉移至「在家/已到貨」</button>
@@ -602,7 +559,6 @@
       </form>
     </div>
   </div>
-
   <!-- Split Manager Modal -->
   <div class="modal" id="modal-split-manager">
     <div class="modal-content" style="max-height:92vh;">
@@ -619,16 +575,13 @@
         <label>自留數量 (例如：2)</label>
         <input type="number" id="split-keep-qty" class="form-control" value="0" min="0" oninput="renderSplitItemsList()">
       </div>
-
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
         <label style="font-weight:700;">待售項目清單</label>
         <button type="button" class="btn-sell" style="padding:6px 12px; font-size:0.8rem; margin:0; width:auto;" onclick="openBatchSellModal()">💰 勾選合併標記售出</button>
       </div>
-
       <div id="split-items-container" style="margin-top:8px;"></div>
     </div>
   </div>
-
   <!-- Transfer Dialog Modal -->
   <div class="modal" id="modal-transfer-dialog">
     <div class="modal-content">
@@ -647,7 +600,6 @@
       <button class="btn-transfer" onclick="executeTransferToArrived()">確認轉移</button>
     </div>
   </div>
-
   <!-- Sell Item Dialog Modal -->
   <div class="modal" id="modal-sell-dialog">
     <div class="modal-content">
@@ -674,7 +626,6 @@
         </select>
         <input type="text" id="sell-platform-other" class="form-control other-input-block" placeholder="請填寫平台名稱">
       </div>
-
       <div class="form-group" style="background:var(--primary-light); padding:10px; border-radius:10px;">
         <label style="color:var(--primary-dark); font-weight:700; margin-bottom:8px;">買家交易明細 (自由填寫)</label>
         <div class="form-group">
@@ -690,7 +641,6 @@
           <input type="text" id="sell-buyer-extra-info" class="form-control" placeholder="例如：匯款後保留至月底寄出">
         </div>
       </div>
-
       <div class="form-group">
         <label>買家交易憑證/截圖 (1-3張)</label>
         <div class="photo-uploader" id="uploader-sell-proofs"></div>
@@ -702,7 +652,6 @@
       <button class="btn-sell" onclick="executeMarkAsSold()">確認售出並歸檔</button>
     </div>
   </div>
-
   <!-- Sold Archive Modal -->
   <div class="modal" id="modal-sold-archive">
     <div class="modal-content" style="max-height:92vh;">
@@ -716,7 +665,6 @@
       <div id="sold-archive-list" class="grid" style="margin-top:10px;"></div>
     </div>
   </div>
-
   <!-- Sold Detail Modal -->
   <div class="modal" id="modal-sold-detail">
     <div class="modal-content" style="max-height:90vh;">
@@ -728,12 +676,11 @@
       <button type="button" class="btn-submit" style="background:#7f8c8d; margin-top:15px;" onclick="closeModal('modal-sold-detail')">關閉</button>
     </div>
   </div>
-
   <!-- Export Excel Options Modal -->
   <div class="modal" id="modal-export">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">📊 匯出收支表 (Excel)</div>
+        <div class="modal-title">📊 匯出單排對帳流水帳 (Excel)</div>
         <button class="close-btn" onclick="closeModal('modal-export')">✕</button>
       </div>
       <div class="form-group">
@@ -766,19 +713,18 @@
       </div>
       <div class="form-group">
         <label class="checkbox-inline">
-          <input type="checkbox" id="export-include-sold"> 包含已售出紀錄
+          <input type="checkbox" id="export-include-sold" checked> 包含已售出紀錄
         </label>
       </div>
-      <button class="btn-submit" onclick="executeExportXlsx()">下載原生 Excel (.xlsx) 流水帳</button>
+      <button class="btn-submit" onclick="executeExportXlsx()">下載單排對帳流水帳 Excel (.xlsx)</button>
     </div>
   </div>
-
   <script>
-    // --- 頂部標題 Logo 繪製 ---
-    function renderHeaderLogo() {
-      const headerCanvas = document.getElementById('header-logo-canvas');
-      if (!headerCanvas) return;
-      const ctx = headerCanvas.getContext('2d');
+    // --- Canvas PNG Generator for iOS Icon ---
+    function generatePngLogo() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 180; canvas.height = 180;
+      const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, 180, 180);
       ctx.fillStyle = '#94B4CB';
       ctx.beginPath(); ctx.moveTo(90, 85); ctx.bezierCurveTo(50, 35, 15, 55, 35, 95); ctx.bezierCurveTo(55, 130, 82, 105, 90, 95); ctx.fill();
@@ -786,9 +732,13 @@
       ctx.beginPath(); ctx.moveTo(90, 92); ctx.bezierCurveTo(70, 125, 35, 145, 50, 155); ctx.bezierCurveTo(75, 135, 88, 115, 90, 100); ctx.fill();
       ctx.beginPath(); ctx.moveTo(90, 92); ctx.bezierCurveTo(110, 125, 145, 145, 130, 155); ctx.bezierCurveTo(105, 135, 92, 115, 90, 100); ctx.fill();
       ctx.fillStyle = '#6a8ea8'; ctx.beginPath(); ctx.arc(90, 91, 10, 0, Math.PI * 2); ctx.fill();
+      const pngDataUrl = canvas.toDataURL('image/png');
+      document.getElementById('apple-icon').href = pngDataUrl;
+      document.getElementById('favicon').href = pngDataUrl;
+      const headerCanvas = document.getElementById('header-logo-canvas');
+      if (headerCanvas) headerCanvas.getContext('2d').drawImage(canvas, 0, 0);
     }
-    renderHeaderLogo();
-
+    generatePngLogo();
     // --- State & IndexedDB Init ---
     let db;
     let currentTab = 'arrived'; 
@@ -796,14 +746,11 @@
     let folderPath = [];
     let editingItemId = null;
     let editingFolderId = null;
-
     let currentSplitData = { totalQty: 1, keepQty: 0, items: [] };
     let selectedSplitIndicesForSell = [];
     let cachedArchiveMap = new Map();
-    let archiveRenderTimer = null;
-
+    let archiveDebounceTimer = null;
     let imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [], sellProofs: [], folderCover: [] };
-
     const request = indexedDB.open("MerchCollectorDB_v3", 1);
     request.onupgradeneeded = (e) => {
       db = e.target.result;
@@ -814,7 +761,6 @@
       db = e.target.result;
       renderGrid();
     };
-
     function switchTab(tab) {
       currentTab = tab;
       document.getElementById('tab-arrived').classList.toggle('active', tab === 'arrived');
@@ -825,7 +771,6 @@
       updateBreadcrumbs();
       renderGrid();
     }
-
     function updateBreadcrumbs() {
       const bc = document.getElementById('breadcrumbs');
       let html = `路徑: <span onclick="navigateToFolder(null)">主目錄</span>`;
@@ -834,7 +779,6 @@
       });
       bc.innerHTML = html;
     }
-
     function navigateToFolder(folderId, folderName) {
       if (folderId === null) {
         currentFolderId = null; folderPath = [];
@@ -844,44 +788,35 @@
       updateBreadcrumbs();
       renderGrid();
     }
-
     function navigateToPathIndex(index) {
       folderPath = folderPath.slice(0, index + 1);
       currentFolderId = folderPath[folderPath.length - 1].id;
       updateBreadcrumbs();
       renderGrid();
     }
-
     function clearDateFilter() {
       document.getElementById('date-start').value = '';
       document.getElementById('date-end').value = '';
       renderGrid();
     }
-
     // --- Render Items & Folders ---
     function renderGrid() {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
-
       const searchKeyword = document.getElementById('search-input').value.trim().toLowerCase();
       const sortType = document.getElementById('sort-select').value;
       const dateStart = document.getElementById('date-start').value;
       const dateEnd = document.getElementById('date-end').value;
-
       const tx = db.transaction(["folders", "items"], "readonly");
       const folderStore = tx.objectStore("folders");
       const itemStore = tx.objectStore("items");
-
       folderStore.getAll().onsuccess = (e) => {
         const allFolders = e.target.result || [];
         itemStore.getAll().onsuccess = (e2) => {
           const allItems = e2.target.result || [];
-
           let folders = [];
           let itemMap = new Map();
-
           const isGlobalSearch = searchKeyword || dateStart || dateEnd;
-
           if (!dateStart && !dateEnd) {
             allFolders.forEach(f => {
               if (f.tab === currentTab) {
@@ -893,7 +828,6 @@
               }
             });
           }
-
           allItems.forEach(val => {
             if (!val.isSold) {
               if (isGlobalSearch) {
@@ -912,12 +846,10 @@
                     ].join(' ').toLowerCase();
                     matchKey = searchSource.includes(searchKeyword);
                   }
-
                   let matchDate = true;
                   const itemDate = val.tab === 'arrived' ? val.receivedDate : val.preDate;
                   if (dateStart && (!itemDate || itemDate < dateStart)) matchDate = false;
                   if (dateEnd && (!itemDate || itemDate > dateEnd)) matchDate = false;
-
                   if (matchKey && matchDate) itemMap.set(val.id, val);
                 }
               } else {
@@ -929,14 +861,12 @@
               }
             }
           });
-
           let items = Array.from(itemMap.values());
           sortItemList(items, sortType);
           displayGridElements(folders, items);
         };
       };
     }
-
     function sortItemList(items, sortType) {
       if (sortType === 'date-desc') {
         items.sort((a,b) => new Date(b.receivedDate || b.preDate || 0) - new Date(a.receivedDate || a.preDate || 0));
@@ -948,11 +878,9 @@
         items.sort((a,b) => (a.price || a.fullTotal || 0) - (b.price || b.fullTotal || 0));
       }
     }
-
     function displayGridElements(folders, items) {
       const container = document.getElementById('grid-container');
       container.innerHTML = '';
-
       folders.forEach(f => {
         const div = document.createElement('div');
         div.className = 'card card-folder';
@@ -962,7 +890,6 @@
         if (f.coverPhoto) {
           coverHtml = `<img src="${f.coverPhoto}" class="card-img" alt="封面" loading="lazy">`;
         }
-
         div.innerHTML = `
           ${coverHtml}
           <div class="card-title">${f.name}</div>
@@ -973,7 +900,6 @@
         `;
         container.appendChild(div);
       });
-
       items.forEach(item => {
         const div = document.createElement('div');
         div.className = 'card';
@@ -982,11 +908,9 @@
         let imgUrl = null;
         if (item.photos && item.photos.length > 0) imgUrl = item.photos[0];
         if (!imgUrl && item.prePhotos && item.prePhotos.length > 0) imgUrl = item.prePhotos[0];
-
         let coverHtml = imgUrl 
           ? `<img src="${imgUrl}" class="card-img" alt="週邊圖" loading="lazy">` 
           : `<div class="card-no-img">無圖片</div>`;
-
         const title = item.title || item.preTitle || item.category;
         
         let splitTag = '';
@@ -994,13 +918,11 @@
           const unsoldSplitCount = item.splitData.items.filter(si => !si.isSold).length;
           splitTag = `<span class="badge" style="background:#8e44ad; color:white;">分售待售:${unsoldSplitCount}件</span>`;
         }
-
         const priceDisplay = item.tab === 'arrived' ? `$${item.price || 0}` : getPreorderPriceBadge(item);
         
         let needSecondHtml = '';
         if (item.tab === 'preorder' && item.needSecond === '是') needSecondHtml = `<span class="badge badge-danger">需二補</span>`;
         let forsaleBadge = item.isForsale ? `<span class="badge badge-success">待售中</span>` : '';
-
         div.innerHTML = `
           ${coverHtml}
           <div class="card-title">${title}</div>
@@ -1015,26 +937,21 @@
         container.appendChild(div);
       });
     }
-
     function getPreorderPriceBadge(item) {
       if (item.payType === '全付') return `全付 $${item.fullTotal || 0}`;
       if (item.payType === '付一半（訂金）') return `總額 $${item.halfTotal || 0}`;
       if (item.payType === '未付') return `待付 $${item.unpaidTotal || 0}`;
       return `約 $${item.otherTotal || 0}`;
     }
-
     // --- Modal Management ---
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
     // --- Folder CRUD & Tree Selection ---
     function openFolderModal(folderId = null) {
       editingFolderId = folderId;
       document.getElementById('folder-name').value = '';
       imgStore.folderCover = [];
-
       populateFolderParentSelect();
-
       if (folderId) {
         document.getElementById('folder-modal-title').innerText = '編輯資料夾';
         document.getElementById('btn-delete-folder').style.display = 'block';
@@ -1055,18 +972,15 @@
       }
       openModal('modal-folder');
     }
-
     function populateFolderParentSelect() {
       const select = document.getElementById('folder-parent-select');
       select.innerHTML = '<option value="">(根目錄 / 無上層資料夾)</option>';
-
       const tx = db.transaction("folders", "readonly");
       tx.objectStore("folders").getAll().onsuccess = (e) => {
         const allFolders = e.target.result.filter(f => f.tab === currentTab);
         buildTreeOptions(allFolders, null, 0, select, editingFolderId);
       };
     }
-
     function buildTreeOptions(folders, parentId, depth, selectEl, excludeFolderId = null) {
       folders.filter(f => f.parentId === parentId).forEach(f => {
         if (f.id === excludeFolderId) return;
@@ -1077,11 +991,9 @@
         buildTreeOptions(folders, f.id, depth + 1, selectEl, excludeFolderId);
       });
     }
-
     function saveFolder() {
       const name = document.getElementById('folder-name').value.trim();
       if (!name) return alert('請輸入資料夾名稱');
-
       const parentVal = document.getElementById('folder-parent-select').value;
       const folderData = {
         id: editingFolderId || 'f_' + Date.now(),
@@ -1090,7 +1002,6 @@
         parentId: parentVal === "" ? null : parentVal,
         coverPhoto: imgStore.folderCover.length > 0 ? imgStore.folderCover[0] : null
       };
-
       const tx = db.transaction("folders", "readwrite");
       tx.objectStore("folders").put(folderData);
       tx.oncomplete = () => {
@@ -1098,7 +1009,6 @@
         renderGrid();
       };
     }
-
     function deleteCurrentFolder() {
       if (!editingFolderId || !confirm('確定要刪除這個資料夾嗎？裡面的品項將移至主目錄。')) return;
       const tx = db.transaction("folders", "readwrite");
@@ -1108,55 +1018,43 @@
         renderGrid();
       };
     }
-
     // --- Item Tree Select Populate ---
     function populateItemFolderSelects(targetFolderId, targetForsaleFolderId) {
       const select = document.getElementById('field-folder-select');
       const forsaleSelect = document.getElementById('field-forsale-folder-select');
       select.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
       forsaleSelect.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
-
       const tx = db.transaction("folders", "readonly");
       tx.objectStore("folders").getAll().onsuccess = (e) => {
         const allFolders = e.target.result;
         buildTreeOptions(allFolders.filter(f => f.tab === (currentTab === 'forsale' ? 'arrived' : currentTab)), null, 0, select);
         buildTreeOptions(allFolders.filter(f => f.tab === 'forsale'), null, 0, forsaleSelect);
-
         if (targetFolderId) select.value = targetFolderId;
         if (targetForsaleFolderId) forsaleSelect.value = targetForsaleFolderId;
       };
     }
-
     function toggleForsaleFolderGroup() {
       const isChecked = document.getElementById('field-is-forsale').checked;
       document.getElementById('group-forsale-folder').style.display = isChecked ? 'block' : 'none';
     }
-
     // --- Open Item Modal ---
     function openItemModal(item = null) {
       editingItemId = item ? item.id : null;
       document.getElementById('item-form').reset();
       imgStore = { photos: [], proofs: [], album: [], prePhotos: [], preProofs: [] };
-
       currentSplitData = item && item.splitData ? JSON.parse(JSON.stringify(item.splitData)) : { totalQty: 1, keepQty: 0, items: [] };
-
       populateItemFolderSelects(item ? item.folderId : currentFolderId, item ? item.forsaleFolderId : null);
-
       const activeTabMode = currentTab === 'forsale' ? (item ? item.tab : 'arrived') : currentTab;
-
       document.getElementById('section-arrived-fields').style.display = activeTabMode === 'arrived' ? 'block' : 'none';
       document.getElementById('section-preorder-fields').style.display = activeTabMode === 'preorder' ? 'block' : 'none';
-
       document.getElementById('btn-delete-action').style.display = item ? 'block' : 'none';
       document.getElementById('btn-sell-action').style.display = item ? 'block' : 'none';
       document.getElementById('btn-transfer-action').style.display = (item && activeTabMode === 'preorder') ? 'block' : 'none';
       document.getElementById('btn-remove-forsale-action').style.display = (item && item.isForsale) ? 'block' : 'none';
-
       if (item) {
         document.getElementById('field-is-forsale').checked = !!item.isForsale;
         document.getElementById('field-category').value = item.category || '專輯/EP';
         document.getElementById('field-item-type').value = item.itemType || '娃';
-
         if (activeTabMode === 'arrived') {
           document.getElementById('field-title').value = item.title || '';
           document.getElementById('field-price').value = item.price || 0;
@@ -1172,33 +1070,27 @@
           document.getElementById('field-pre-date').value = item.preDate || '';
           document.getElementById('field-pre-eta').value = item.preEta || '';
           document.getElementById('field-pay-type').value = item.payType || '全付';
-
           document.getElementById('pre-full-price').value = item.fullPrice || 0;
           document.getElementById('pre-full-shipfee').value = item.fullShipFee || 0;
           document.getElementById('pre-full-need-second').value = item.needSecond || '否';
           document.getElementById('pre-full-notes').value = item.preNotes || '';
-
           document.getElementById('pre-half-total').value = item.halfPrice || 0;
           document.getElementById('pre-half-paid').value = item.halfPaid || 0;
           document.getElementById('pre-half-shipfee').value = item.halfShipFee || 0;
           document.getElementById('pre-half-need-second').value = item.needSecond || '否';
           document.getElementById('pre-half-notes').value = item.preNotes || '';
-
           document.getElementById('pre-unpaid-total').value = item.unpaidPrice || 0;
           document.getElementById('pre-unpaid-shipfee').value = item.unpaidShipFee || 0;
           document.getElementById('pre-unpaid-need-second').value = item.needSecond || '否';
           document.getElementById('pre-unpaid-notes').value = item.preNotes || '';
-
           document.getElementById('pre-other-total').value = item.otherTotal || '';
           document.getElementById('pre-other-paymethod').value = item.otherPay || '';
           document.getElementById('pre-other-shipmethod').value = item.otherShip || '';
           document.getElementById('pre-other-notes').value = item.preNotes || '';
-
           imgStore.prePhotos = item.prePhotos || [];
           imgStore.preProofs = item.preProofs || [];
         }
       }
-
       updateSplitSummaryUI();
       toggleForsaleFolderGroup();
       toggleAlbumFields();
@@ -1207,7 +1099,6 @@
       
       openModal('modal-item');
     }
-
     function updateSplitSummaryUI() {
       const summaryBox = document.getElementById('split-summary-box');
       if (!currentSplitData.items || currentSplitData.items.length === 0) {
@@ -1220,42 +1111,35 @@
         summaryBox.innerHTML = `總數 <b>${total}</b> 個 | 自留 <b>${keep}</b> 個 | 分售 <b>${splitCount}</b> 個 (已售出 ${soldCount}/${splitCount})`;
       }
     }
-
     function toggleAlbumFields() {
       const cat = document.getElementById('field-category').value;
       const isAlbum = cat === '專輯/EP';
       document.getElementById('group-album-contents').style.display = isAlbum ? 'block' : 'none';
     }
-
     function togglePaymentFlow() {
       const type = document.getElementById('field-pay-type').value;
       document.getElementById('flow-full').style.display = type === '全付' ? 'block' : 'none';
       document.getElementById('flow-half').style.display = type === '付一半（訂金）' ? 'block' : 'none';
       document.getElementById('flow-unpaid').style.display = type === '未付' ? 'block' : 'none';
       document.getElementById('flow-other').style.display = type === '其他' ? 'block' : 'none';
-
       calcFullTotal(); calcHalfTotal(); calcUnpaidTotal();
     }
-
     function checkOtherField(selectEl, targetInputId) {
       const target = document.getElementById(targetInputId);
       if (target) target.style.display = selectEl.value === '其他' ? 'block' : 'none';
     }
-
     function checkOtherShipField(selectEl, shipGroupFeeId, targetInputId) {
       const target = document.getElementById(targetInputId);
       const shipGroup = document.getElementById(shipGroupFeeId);
       if (target) target.style.display = selectEl.value === '其他' ? 'block' : 'none';
       if (shipGroup) shipGroup.style.display = 'block';
     }
-
     function calcFullTotal() {
       const p = parseFloat(document.getElementById('pre-full-price').value) || 0;
       const s = parseFloat(document.getElementById('pre-full-shipfee').value) || 0;
       document.getElementById('calc-full-result').innerText = `金額加總: $${p + s}`;
       return p + s;
     }
-
     function calcHalfTotal() {
       const total = parseFloat(document.getElementById('pre-half-total').value) || 0;
       const paid = parseFloat(document.getElementById('pre-half-paid').value) || 0;
@@ -1266,14 +1150,12 @@
       document.getElementById('calc-half-res2').innerText = `2. 未付金額加總 (未付+運費): $${unpaid + s}`;
       return { totalWithShip: total + s, unpaidWithShip: unpaid + s };
     }
-
     function calcUnpaidTotal() {
       const p = parseFloat(document.getElementById('pre-unpaid-total').value) || 0;
       const s = parseFloat(document.getElementById('pre-unpaid-shipfee').value) || 0;
       document.getElementById('calc-unpaid-result').innerText = `金額加總: $${p + s}`;
       return p + s;
     }
-
     function renderAllPhotoUploaders() {
       renderUploader('uploader-photos', imgStore.photos, 3, 'photos');
       renderUploader('uploader-proofs', imgStore.proofs, 3, 'proofs');
@@ -1281,7 +1163,6 @@
       renderUploader('uploader-pre-photos', imgStore.prePhotos, 3, 'prePhotos');
       renderUploader('uploader-pre-proofs', imgStore.preProofs, 3, 'preProofs');
     }
-
     function renderUploader(elementId, array, max, key) {
       const el = document.getElementById(elementId);
       if (!el) return;
@@ -1296,7 +1177,6 @@
         };
         el.appendChild(img);
       });
-
       if (array.length < max) {
         const btn = document.createElement('div');
         btn.className = 'photo-add-btn'; btn.innerText = '＋';
@@ -1304,7 +1184,6 @@
         el.appendChild(btn);
       }
     }
-
     function triggerImageSelect(targetArray, max, callback) {
       const input = document.createElement('input');
       input.type = 'file'; input.accept = 'image/*';
@@ -1330,7 +1209,6 @@
       };
       input.click();
     }
-
     // --- Split Manager Logic ---
     function openSplitManagerModal() {
       document.getElementById('split-total-qty').value = currentSplitData.totalQty || 1;
@@ -1338,15 +1216,12 @@
       renderSplitItemsList();
       openModal('modal-split-manager');
     }
-
     function renderSplitItemsList() {
       const totalQty = parseInt(document.getElementById('split-total-qty').value) || 1;
       const keepQty = parseInt(document.getElementById('split-keep-qty').value) || 0;
       const splitCount = Math.max(0, totalQty - keepQty);
-
       currentSplitData.totalQty = totalQty;
       currentSplitData.keepQty = keepQty;
-
       while (currentSplitData.items.length < splitCount) {
         const idx = currentSplitData.items.length + 1;
         currentSplitData.items.push({
@@ -1359,23 +1234,18 @@
       if (currentSplitData.items.length > splitCount) {
         currentSplitData.items = currentSplitData.items.slice(0, splitCount);
       }
-
       const container = document.getElementById('split-items-container');
       container.innerHTML = '';
-
       if (splitCount === 0) {
         container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">無分售項目 (全數自留)</div>`;
         return;
       }
-
       currentSplitData.items.forEach((item, idx) => {
         const div = document.createElement('div');
         div.className = 'split-item-card';
-
         const statusBadge = item.isSold 
           ? `<span class="badge badge-danger">已售出 ($${item.soldData?.sellPrice || 0})</span>`
           : `<span class="badge badge-success">待售中</span>`;
-
         div.innerHTML = `
           <div class="split-item-header">
             <label class="checkbox-inline">
@@ -1385,60 +1255,41 @@
             ${statusBadge}
           </div>
           <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-            <input type="text" class="form-control" style="padding:6px;" value="${item.name}" placeholder="自訂項目名稱" onchange="updateSplitItemName(${idx}, this.value)">
-            <input type="number" class="form-control" style="padding:6px; width:90px;" value="${item.price||0}" placeholder="預設售價" onchange="currentSplitData.items[${idx}].price=parseFloat(this.value)||0">
+            <input type="text" class="form-control" style="padding:6px;" value="${item.name}" placeholder="自訂項目名稱" onchange="currentSplitData.items[${idx}].name=this.value" ${item.isSold?'disabled':''}>
+            <input type="number" class="form-control" style="padding:6px; width:90px;" value="${item.price||0}" placeholder="預設售價" onchange="currentSplitData.items[${idx}].price=parseFloat(this.value)||0" ${item.isSold?'disabled':''}>
           </div>
         `;
         container.appendChild(div);
       });
-
       updateSplitSummaryUI();
     }
-
-    function updateSplitItemName(idx, newName) {
-      if (currentSplitData.items[idx]) {
-        currentSplitData.items[idx].name = newName;
-      }
-    }
-
     function openBatchSellModal() {
       const checkboxes = document.querySelectorAll('.split-checkbox:checked');
       if (checkboxes.length === 0) {
         return alert('請先勾選至少一個要售出的待售項目！');
       }
-
       selectedSplitIndicesForSell = Array.from(checkboxes).map(cb => parseInt(cb.value));
       const names = selectedSplitIndicesForSell.map(idx => currentSplitData.items[idx].name).join('、');
-
       const autoTotalPrice = selectedSplitIndicesForSell.reduce((sum, idx) => sum + (currentSplitData.items[idx].price || 0), 0);
-
       document.getElementById('sell-dialog-title').innerText = `合併售出：${names}`;
       document.getElementById('sell-price').value = autoTotalPrice;
-
       document.getElementById('sell-buyer-nickname').value = '';
       document.getElementById('sell-buyer-order-no').value = '';
       document.getElementById('sell-buyer-extra-info').value = '';
-
       imgStore.sellProofs = [];
       renderUploader('uploader-sell-proofs', imgStore.sellProofs, 3, 'sellProofs');
       document.getElementById('sell-date').value = new Date().toISOString().split('T')[0];
-
       openModal('modal-sell-dialog');
     }
-
     // --- Save Item ---
     function saveItem() {
       const selectedFolderValue = document.getElementById('field-folder-select').value;
       const targetFolderId = selectedFolderValue === "" ? null : selectedFolderValue;
-
       const selectedForsaleFolderValue = document.getElementById('field-forsale-folder-select').value;
       const targetForsaleFolderId = selectedForsaleFolderValue === "" ? null : selectedForsaleFolderValue;
-
       const activeTabMode = currentTab === 'forsale' ? 'arrived' : currentTab;
-
       const hasUnsoldSplit = currentSplitData.items && currentSplitData.items.some(si => !si.isSold);
       const isForsaleChecked = document.getElementById('field-is-forsale').checked || hasUnsoldSplit;
-
       const itemData = {
         id: editingItemId || 'item_' + Date.now(),
         tab: activeTabMode,
@@ -1449,7 +1300,6 @@
         itemType: document.getElementById('field-item-type').value,
         splitData: currentSplitData 
       };
-
       if (activeTabMode === 'arrived') {
         itemData.title = document.getElementById('field-title').value;
         itemData.price = parseFloat(document.getElementById('field-price').value) || 0;
@@ -1467,7 +1317,6 @@
         itemData.preDate = document.getElementById('field-pre-date').value;
         itemData.preEta = document.getElementById('field-pre-eta').value;
         itemData.payType = document.getElementById('field-pay-type').value;
-
         if (itemData.payType === '全付') {
           itemData.needSecond = document.getElementById('pre-full-need-second').value;
           itemData.preNotes = document.getElementById('pre-full-notes').value;
@@ -1481,26 +1330,21 @@
           itemData.needSecond = '否';
           itemData.preNotes = document.getElementById('pre-other-notes').value;
         }
-
         itemData.fullPrice = parseFloat(document.getElementById('pre-full-price').value) || 0;
         itemData.fullShipFee = parseFloat(document.getElementById('pre-full-shipfee').value) || 0;
         itemData.fullTotal = calcFullTotal();
-
         const halfRes = calcHalfTotal();
         itemData.halfPrice = parseFloat(document.getElementById('pre-half-total').value) || 0;
         itemData.halfPaid = parseFloat(document.getElementById('pre-half-paid').value) || 0;
         itemData.halfShipFee = parseFloat(document.getElementById('pre-half-shipfee').value) || 0;
         itemData.halfTotal = halfRes.totalWithShip;
-
         itemData.unpaidPrice = parseFloat(document.getElementById('pre-unpaid-total').value) || 0;
         itemData.unpaidShipFee = parseFloat(document.getElementById('pre-unpaid-shipfee').value) || 0;
         itemData.unpaidTotal = calcUnpaidTotal();
-
         itemData.otherTotal = document.getElementById('pre-other-total').value;
         itemData.otherPay = document.getElementById('pre-other-paymethod').value;
         itemData.otherShip = document.getElementById('pre-other-shipmethod').value;
       }
-
       const tx = db.transaction("items", "readwrite");
       tx.objectStore("items").put(itemData);
       tx.oncomplete = () => {
@@ -1509,40 +1353,33 @@
         renderGrid();
       };
     }
-
     // --- Transfer Dialog & Logic ---
     function openTransferModal() {
       const select = document.getElementById('transfer-target-folder');
       select.innerHTML = '<option value="">(根目錄 / 無資料夾)</option>';
-
       const tx = db.transaction("folders", "readonly");
       tx.objectStore("folders").getAll().onsuccess = (e) => {
         buildTreeOptions(e.target.result.filter(f => f.tab === 'arrived'), null, 0, select);
         openModal('modal-transfer-dialog');
       };
     }
-
     function executeTransferToArrived() {
       if (!editingItemId) return;
       const secondFee = parseFloat(document.getElementById('transfer-second-fee').value) || 0;
       const targetFolderValue = document.getElementById('transfer-target-folder').value;
       const targetFolderId = targetFolderValue === "" ? null : targetFolderValue;
-
       const tx = db.transaction("items", "readonly");
       tx.objectStore("items").get(editingItemId).onsuccess = (e) => {
         const preItem = e.target.result;
         if (!preItem) return;
-
         let basePrice = preItem.fullTotal || preItem.halfTotal || preItem.unpaidTotal || parseFloat(preItem.otherTotal) || 0;
         let finalPrice = basePrice + secondFee;
-
         let infoText = `【原預購明細】\n`;
         infoText += `下單日期: ${preItem.preDate || '未填'}\n`;
         infoText += `預計抵達: ${preItem.preEta || '未填'}\n`;
         infoText += `付款狀態: ${preItem.payType}\n`;
         infoText += `二補金額: $${secondFee}\n`;
         if (preItem.preNotes) infoText += `原備註: ${preItem.preNotes}`;
-
         const arrivedItem = {
           id: preItem.id,
           tab: 'arrived',
@@ -1559,7 +1396,6 @@
           album: [], albumText: '', notes: preItem.preNotes || '', info: infoText,
           splitData: preItem.splitData
         };
-
         const writeTx = db.transaction("items", "readwrite");
         writeTx.objectStore("items").put(arrivedItem);
         writeTx.oncomplete = () => {
@@ -1570,7 +1406,6 @@
         };
       };
     }
-
     // --- Mark as Sold Modal & Logic ---
     function openSellModal() {
       selectedSplitIndicesForSell = [];
@@ -1578,33 +1413,27 @@
       document.getElementById('sell-buyer-nickname').value = '';
       document.getElementById('sell-buyer-order-no').value = '';
       document.getElementById('sell-buyer-extra-info').value = '';
-
       imgStore.sellProofs = [];
       renderUploader('uploader-sell-proofs', imgStore.sellProofs, 3, 'sellProofs');
       document.getElementById('sell-date').value = new Date().toISOString().split('T')[0];
       openModal('modal-sell-dialog');
     }
-
     function executeMarkAsSold() {
       if (!editingItemId) return;
       const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
       const platformSelect = document.getElementById('sell-platform').value;
       const platformStr = platformSelect === '其他' ? document.getElementById('sell-platform-other').value : platformSelect;
-
       const buyerNickname = document.getElementById('sell-buyer-nickname').value.trim();
       const buyerOrderNo = document.getElementById('sell-buyer-order-no').value.trim();
       const buyerExtra = document.getElementById('sell-buyer-extra-info').value.trim();
       const sellDate = document.getElementById('sell-date').value;
-
       const tx = db.transaction("items", "readwrite");
       tx.objectStore("items").get(editingItemId).onsuccess = (e) => {
         const item = e.target.result;
         if (!item) return;
-
         if (selectedSplitIndicesForSell.length > 0) {
           const batchTxId = 'tx_' + Date.now();
           const splitPricePerItem = sellPrice / selectedSplitIndicesForSell.length;
-
           selectedSplitIndicesForSell.forEach(idx => {
             if (item.splitData && item.splitData.items[idx]) {
               item.splitData.items[idx].isSold = true;
@@ -1622,17 +1451,14 @@
               };
             }
           });
-
           const allSold = item.splitData.items.every(si => si.isSold);
           if (allSold) {
             item.isForsale = false;
           }
-
           tx.objectStore("items").put(item);
         } else {
           const originalCost = item.price || item.fullTotal || item.halfTotal || item.unpaidTotal || parseFloat(item.otherTotal) || 0;
           const profit = sellPrice - originalCost;
-
           item.isSold = true;
           item.soldData = {
             sellPrice: sellPrice,
@@ -1644,11 +1470,9 @@
             sellDate: sellDate,
             profit: profit
           };
-
           tx.objectStore("items").put(item);
         }
       };
-
       tx.oncomplete = () => {
         alert(`已成功儲存售出與買家資訊！`);
         closeModal('modal-sell-dialog');
@@ -1657,7 +1481,6 @@
         renderGrid();
       };
     }
-
     function removeForsaleStatus() {
       if (!editingItemId) return;
       const tx = db.transaction("items", "readwrite");
@@ -1673,7 +1496,6 @@
         renderGrid();
       };
     }
-
     function deleteCurrentItem() {
       if (!editingItemId || !confirm('確定要徹底刪除這個品項嗎？刪除後無法復原！')) return;
       const tx = db.transaction("items", "readwrite");
@@ -1683,34 +1505,27 @@
         renderGrid();
       };
     }
-
-    // --- 防抖即時搜尋歸檔庫 ---
-    function debouncedRenderSoldArchiveList() {
-      clearTimeout(archiveRenderTimer);
-      archiveRenderTimer = setTimeout(() => {
-        renderSoldArchiveList();
-      }, 150);
-    }
-
+    // --- Sold Archive Grid & Restore ---
     function openSoldArchiveModal() {
       renderSoldArchiveList();
       openModal('modal-sold-archive');
     }
-
+    function debouncedRenderSoldArchiveList() {
+      if (archiveDebounceTimer) clearTimeout(archiveDebounceTimer);
+      archiveDebounceTimer = setTimeout(() => {
+        renderSoldArchiveList();
+      }, 250);
+    }
     function renderSoldArchiveList() {
       const container = document.getElementById('sold-archive-list');
       container.innerHTML = '';
-
       const keyword = document.getElementById('sold-search-input').value.trim().toLowerCase();
-
       const tx = db.transaction("items", "readonly");
       tx.objectStore("items").getAll().onsuccess = (e) => {
         const allItems = e.target.result || [];
         cachedArchiveMap.clear();
-
         allItems.forEach(item => {
           const parentTitle = item.title || item.preTitle || item.category;
-
           // 1. 一般整組售出
           if (item.isSold) {
             const buyerStr = item.soldData ? `${item.soldData.buyerNickname||''} ${item.soldData.buyerOrderNo||''} ${item.soldData.buyerExtra||''}` : '';
@@ -1733,22 +1548,19 @@
               });
             }
           }
-
           // 2. 分售子項目售出
           if (item.splitData && item.splitData.items) {
             item.splitData.items.forEach((si, sIdx) => {
               if (si.isSold && si.soldData) {
-                const currentName = si.name;
+                const currentName = si.name || `#${sIdx+1}`;
                 const buyerStr = `${si.soldData.buyerNickname||''} ${si.soldData.buyerOrderNo||''} ${si.soldData.buyerExtra||''}`;
                 const matchKeyword = !keyword || (parentTitle + currentName + buyerStr + (si.soldData.platform||'')).toLowerCase().includes(keyword);
-
                 if (matchKeyword) {
                   if (si.soldData.batchTxId) {
                     const batchKey = `batch_${item.id}_${si.soldData.batchTxId}`;
                     if (!cachedArchiveMap.has(batchKey)) {
                       const batchIndices = si.soldData.batchIndices || [sIdx];
                       const batchNames = batchIndices.map(idx => item.splitData.items[idx]?.name || `#${idx+1}`).join('、');
-
                       cachedArchiveMap.set(batchKey, {
                         type: 'split_batch',
                         itemObj: item,
@@ -1776,11 +1588,11 @@
                       sellPrice: si.soldData.sellPrice || 0,
                       platform: si.soldData.platform || '',
                       coverImg: (item.photos && item.photos[0]) || (item.prePhotos && item.prePhotos[0]) || '',
-                      buyerNickname: si.soldData?.buyerNickname || '買家明細',
-                      buyerOrderNo: si.soldData?.buyerOrderNo || '',
-                      buyerExtra: si.soldData?.buyerExtra || '',
-                      sellDate: si.soldData?.sellDate || '',
-                      proofs: si.soldData?.sellProofs || []
+                      buyerNickname: si.soldData.buyerNickname || '買家明細',
+                      buyerOrderNo: si.soldData.buyerOrderNo || '',
+                      buyerExtra: si.soldData.buyerExtra || '',
+                      sellDate: si.soldData.sellDate || '',
+                      proofs: si.soldData.sellProofs || []
                     });
                   }
                 }
@@ -1788,21 +1600,16 @@
             });
           }
         });
-
-        // 繪製卡片
         cachedArchiveMap.forEach((card, key) => {
           const div = document.createElement('div');
           div.className = 'card';
           div.onclick = () => openSoldDetailModal(key);
-
           let badgeHtml = card.type === 'full' 
             ? `<span class="badge ${card.profit >= 0 ? 'badge-success' : 'badge-danger'}">損益: $${card.profit}</span>`
             : `<span class="badge badge-success">買家: ${card.buyerNickname||'明細'}</span>`;
-
           let coverHtml = card.coverImg 
             ? `<img src="${card.coverImg}" class="card-img" alt="圖">`
             : `<div class="card-no-img">無圖片</div>`;
-
           div.innerHTML = `
             ${coverHtml}
             <div class="card-title">${card.title}</div>
@@ -1816,19 +1623,16 @@
         });
       };
     }
-
     // --- 查看歸檔詳情彈窗 ---
     function openSoldDetailModal(cardKey) {
       const data = cachedArchiveMap.get(cardKey);
       if (!data) return;
-
       const body = document.getElementById('sold-detail-body');
       
       let proofImgsHtml = '無憑證照片';
       if (data.proofs && data.proofs.length > 0) {
         proofImgsHtml = data.proofs.map(src => `<img src="${src}" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--border-color);">`).join(' ');
       }
-
       body.innerHTML = `
         <div class="detail-row"><span class="detail-label">售出名稱</span><span class="detail-value">${data.title}</span></div>
         <div class="detail-row"><span class="detail-label">實際總售價</span><span class="detail-value" style="color:var(--success-color); font-size:1rem;">$${data.sellPrice}</span></div>
@@ -1843,21 +1647,16 @@
         </div>
         <button type="button" class="btn-delete" style="margin-top:20px; font-weight:600;" onclick="executeArchiveRestore('${cardKey}'); closeModal('modal-sold-detail');">復原此交易 (取消售出)</button>
       `;
-
       openModal('modal-sold-detail');
     }
-
     function executeArchiveRestore(cardKey) {
       const data = cachedArchiveMap.get(cardKey);
       if (!data) return;
-
       if (!confirm(`確定要復原「${data.title}」的售出狀態嗎？`)) return;
-
       const tx = db.transaction("items", "readwrite");
       tx.objectStore("items").get(data.itemObj.id).onsuccess = (e) => {
         const item = e.target.result;
         if (!item) return;
-
         if (data.type === 'full') {
           item.isSold = false;
         } else if (data.type === 'split_single') {
@@ -1877,27 +1676,22 @@
             item.isForsale = true;
           }
         }
-
         tx.objectStore("items").put(item);
       };
-
       tx.oncomplete = () => {
         alert('成功復原！項目已重新回到對應清單中。');
         renderSoldArchiveList();
         renderGrid();
       };
     }
-
     // --- Export Excel ---
     function openExportModal() { openModal('modal-export'); }
-
     function toggleExportCatAll(allCb) {
       const options = document.querySelectorAll('.export-cat-option');
       if (allCb.checked) {
         options.forEach(cb => cb.checked = false);
       }
     }
-
     function toggleExportCatSub() {
       const allCb = document.getElementById('export-cat-all');
       const options = document.querySelectorAll('.export-cat-option');
@@ -1905,139 +1699,115 @@
       options.forEach(cb => {
         if (cb.checked) hasCheckedSub = true;
       });
-
       if (hasCheckedSub) {
         allCb.checked = false;
       } else {
         allCb.checked = true;
       }
     }
-
     function executeExportXlsx() {
       const range = document.getElementById('export-range').value;
       const includeSold = document.getElementById('export-include-sold').checked;
       const isAllCat = document.getElementById('export-cat-all').checked;
-
       let selectedCategories = [];
       if (!isAllCat) {
         document.querySelectorAll('.export-cat-option:checked').forEach(cb => {
           selectedCategories.push(cb.value);
         });
       }
-
       const tx = db.transaction("items", "readonly");
       tx.objectStore("items").getAll().onsuccess = (e) => {
         let items = e.target.result;
-
         if (!includeSold) items = items.filter(i => !i.isSold);
-
         if (range === 'arrived') items = items.filter(i => i.tab === 'arrived');
         if (range === 'preorder') items = items.filter(i => i.tab === 'preorder');
         if (range === 'forsale') items = items.filter(i => i.isForsale);
-
         if (!isAllCat && selectedCategories.length > 0) {
           items = items.filter(i => selectedCategories.includes(i.category));
         }
-
         let rawRows = [];
-
         items.forEach(i => {
-          const category = i.category || '';
-          const name = i.title || i.preTitle || '';
-          const baseDate = i.receivedDate || i.preDate || '';
+          const parentTitle = i.title || i.preTitle || i.category || '未命名週邊';
+          const baseDate = i.receivedDate || i.preDate || '2026-01-01';
           const totalCost = i.price || i.fullTotal || i.halfTotal || i.unpaidTotal || parseFloat(i.otherTotal) || 0;
-
           if (i.splitData && i.splitData.items && i.splitData.items.length > 0) {
             const totalQty = i.splitData.totalQty || 1;
             const keepQty = i.splitData.keepQty || 0;
             const perItemCost = totalCost / totalQty;
-
             if (keepQty > 0) {
               const keepCost = perItemCost * keepQty;
               rawRows.push({
                 date: baseDate,
-                name: `${name} (自留 ${keepQty} 件)`,
+                name: `${parentTitle} (自留 ${keepQty} 件)`,
                 totalCost: totalCost,
                 unitCost: keepCost,
                 sellPrice: 0,
-                profit: -keepCost,
-                buyer: '-',
+                profitFormula: 0 - keepCost,
+                buyerNickname: '-',
+                buyerOrderNo: '-',
                 platform: '-'
               });
             }
-
-            i.splitData.items.forEach(si => {
+            i.splitData.items.forEach((si, sIdx) => {
               if (includeSold || !si.isSold) {
+                const sellDate = si.soldData?.sellDate || baseDate;
                 const sellPrice = si.isSold ? (si.soldData?.sellPrice || 0) : 0;
-                const profit = si.isSold ? (sellPrice - perItemCost) : -perItemCost;
-                const date = (si.isSold && si.soldData?.sellDate) ? si.soldData.sellDate : baseDate;
-
                 rawRows.push({
-                  date: date,
-                  name: `${name} (${si.name})`,
+                  date: sellDate,
+                  name: `${parentTitle} - ${si.name||`分售#${sIdx+1}`}`,
                   totalCost: totalCost,
                   unitCost: perItemCost,
                   sellPrice: sellPrice,
-                  profit: profit,
-                  buyer: si.soldData?.buyerNickname || '-',
+                  profitFormula: si.isSold ? (sellPrice - perItemCost) : (0 - perItemCost),
+                  buyerNickname: si.soldData?.buyerNickname || '-',
+                  buyerOrderNo: si.soldData?.buyerOrderNo || '-',
                   platform: si.soldData?.platform || '-'
                 });
               }
             });
           } else {
-            const sellPrice = i.isSold ? (i.soldData?.sellPrice || 0) : 0;
-            const profit = i.isSold ? (sellPrice - totalCost) : -totalCost;
-            const date = (i.isSold && i.soldData?.sellDate) ? i.soldData.sellDate : baseDate;
-
             rawRows.push({
-              date: date,
-              name: name,
+              date: baseDate,
+              name: parentTitle,
               totalCost: totalCost,
               unitCost: totalCost,
-              sellPrice: sellPrice,
-              profit: profit,
-              buyer: i.soldData?.buyerNickname || '-',
+              sellPrice: i.isSold ? (i.soldData?.sellPrice || 0) : 0,
+              profitFormula: i.isSold ? ((i.soldData?.sellPrice || 0) - totalCost) : (0 - totalCost),
+              buyerNickname: i.soldData?.buyerNickname || '-',
+              buyerOrderNo: i.soldData?.buyerOrderNo || '-',
               platform: i.soldData?.platform || '-'
             });
           }
         });
-
+        rawRows.sort((a,b) => new Date(a.date) - new Date(b.date));
         if (rawRows.length === 0) {
           alert('當前選擇的條件下沒有資料可以匯出！');
           return;
         }
-
-        rawRows.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-
         const excelData = rawRows.map(r => ({
           "日期": r.date,
-          "商品名稱/分售備註": r.name,
+          "商品名稱 / 分售備註": r.name,
           "進貨總成本": r.totalCost,
           "單件進貨成本": r.unitCost,
           "實際售價": r.sellPrice,
-          "單筆損益": r.profit,
-          "買家暱稱": r.buyer,
-          "販售平台": r.platform
+          "單筆損益": r.profitFormula,
+          "買家暱稱": r.buyerNickname,
+          "訂單單號": r.buyerOrderNo,
+          "平台": r.platform
         }));
-
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "單排對帳流水帳");
-
-        worksheet['!cols'] = [ { wch: 12 }, { wch: 28 }, { wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 10 } ];
-
+        worksheet['!cols'] = [ { wch: 12 }, { wch: 28 }, { wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 18 }, { wch: 10 } ];
         const todayStr = new Date().toISOString().split('T')[0];
-        XLSX.writeFile(workbook, `週邊們_單排流水帳_${todayStr}.xlsx`);
-
+        XLSX.writeFile(workbook, `週邊們_單排對帳流水帳_${todayStr}.xlsx`);
         closeModal('modal-export');
       };
     }
-
     // --- Backup & Restore (JSON) ---
     function backupData() {
       const tx = db.transaction(["folders", "items"], "readonly");
       let exportData = { folders: [], items: [] };
-
       tx.objectStore("folders").getAll().onsuccess = (e) => {
         exportData.folders = e.target.result;
         tx.objectStore("items").getAll().onsuccess = (e2) => {
@@ -2050,7 +1820,6 @@
         };
       };
     }
-
     function restoreData() {
       const input = document.createElement('input');
       input.type = 'file';
@@ -2066,7 +1835,6 @@
               const tx = db.transaction(["folders", "items"], "readwrite");
               const folderStore = tx.objectStore("folders");
               const itemStore = tx.objectStore("items");
-
               if (Array.isArray(data.folders)) {
                 data.folders.forEach(f => {
                   if (!f.tab) f.tab = 'arrived';
@@ -2074,7 +1842,6 @@
                   folderStore.put(f);
                 });
               }
-
               if (Array.isArray(data.items)) {
                 data.items.forEach(i => {
                   if (i.isForsale === undefined) i.isForsale = false;
@@ -2084,7 +1851,6 @@
                   itemStore.put(i);
                 });
               }
-
               tx.oncomplete = () => {
                 alert('還原成功！舊資料已順利升級並匯入。');
                 renderGrid();
